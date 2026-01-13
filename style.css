@@ -1,0 +1,130 @@
+/* Custom styles to complement Tailwind */
+
+/* Navigation */
+.nav-link {
+  @apply px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors flex items-center gap-2 font-medium;
+}
+
+.nav-link.active {
+  @apply bg-blue-100 text-blue-700;
+}
+
+/* View pages */
+.view-page {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.loading {
+  @apply text-center py-16 text-slate-500 text-lg animate-pulse;
+}
+
+.error {
+  @apply text-center py-16 text-red-600;
+}
+
+.error button {
+  @apply mt-4 px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors;
+}
+
+.row-count {
+  @apply text-slate-600 text-sm px-6 py-3 bg-slate-50 border-b border-slate-200 font-medium;
+}
+
+.pagination { @apply flex items-center gap-2 px-6 py-3 bg-white border-t border-slate-200; }
+.pagination button { @apply px-3 py-1 bg-slate-100 rounded hover:bg-slate-200; }
+.pagination #pageInfo { @apply text-sm text-slate-600; }
+
+/* Table styles */
+#tableContainer h2 {
+  @apply text-2xl font-bold text-slate-800 px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-blue-50 to-slate-50;
+}
+
+#tableContainer table {
+  @apply w-full border-collapse;
+  min-width: 100%;
+  margin: 0 auto;
+}
+
+/* horizontal scroll wrapper */
+.table-scroll { 
+  overflow-x: auto;
+  width: 100%;
+}
+
+#tableContainer {
+  @apply mx-auto;
+}
+
+/* compact mode */
+.compact #tableContainer td, .compact #tableContainer th {
+  @apply px-2 py-2 text-xs;
+}
+
+
+#tableContainer th {
+  @apply px-4 py-3 text-left text-xs font-semibold text-slate-700 bg-slate-100 border-b-2 border-slate-300 uppercase tracking-wider cursor-pointer hover:bg-slate-200 transition-colors sticky top-0;
+}
+
+#tableContainer th:hover {
+  @apply bg-blue-50;
+}
+
+#tableContainer td {
+  @apply px-4 py-3 text-sm text-slate-700 border-b border-slate-200;
+  vertical-align: middle;
+}
+
+#tableContainer tbody tr {
+  @apply hover:bg-blue-50 transition-colors;
+}
+
+#tableContainer tbody tr:nth-child(even) {
+  @apply bg-slate-50;
+}
+
+/* Mobile responsive table */
+@media (max-width: 768px) {
+  #tableContainer table,
+  #tableContainer thead,
+  #tableContainer tbody,
+  #tableContainer th,
+  #tableContainer td,
+  #tableContainer tr {
+    @apply block;
+  }
+
+  #tableContainer thead tr {
+    @apply hidden;
+  }
+
+  #tableContainer tr {
+    @apply mb-4 border border-slate-200 rounded-lg shadow-sm overflow-hidden;
+  }
+
+  #tableContainer td {
+    @apply flex justify-between items-center px-4 py-3 border-b border-slate-100;
+    position: relative;
+    padding-left: 40%;
+  }
+
+  #tableContainer td::before {
+    content: attr(data-label);
+    @apply absolute left-4 font-semibold text-slate-600 text-xs uppercase;
+  }
+
+  #tableContainer td:last-child {
+    @apply border-b-0;
+  }
+}
+

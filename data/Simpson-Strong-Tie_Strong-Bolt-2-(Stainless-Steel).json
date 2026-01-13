@@ -1,0 +1,190 @@
+{
+  "name": "Strong-Bolt 2 (Stainless Steel)",
+  "company": "Simpson Strong-Tie",
+  "diameters": [
+    {
+      "Anchor Size": {
+        "value": "1/4\"",
+        "Drill Bit Diameter": "1/4\"",
+        "Effective Embedment Depth (hef)": [
+          {
+            "value": 1.5,
+            "Nominal Embedment Depth (hnom)": 1.75,
+            "Minimum Hole Depth (hhole)": 1.875,
+            "Cracked Concrete Data": false,
+            "Seismic Categories": "A-B",
+            "Anchor Category": 1,
+            "Tension Steel Strength (fNsa)": 2295,
+            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 1433,
+            "Tension Breakout Strength - Cracked Concrete (fNcb)": null,
+            "Pullout Strength - Uncracked Concrete (fNp,uncr)": 1251,
+            "Pullout Strength - Cracked Concrete (fNp,cr)": null,
+            "Shear Steel Strength (fVsa)": 1043,
+            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 1543,
+            "Pryout Strength - Cracked Concrete (fVcp,cr)": null
+          }
+        ]
+      }
+    },
+    {
+      "Anchor Size": {
+        "value": "3/8\"",
+        "Drill Bit Diameter": "3/8\"",
+        "Effective Embedment Depth (hef)": [
+          {
+            "value": 1.5,
+            "Nominal Embedment Depth (hnom)": 1.875,
+            "Minimum Hole Depth (hhole)": 2.0,
+            "Cracked Concrete Data": true,
+            "Seismic Categories": "A-F",
+            "Anchor Category": 1,
+            "Tension Steel Strength (fNsa)": 3855,
+            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 1433,
+            "Tension Breakout Strength - Cracked Concrete (fNcb)": 1015,
+            "Pullout Strength - Uncracked Concrete (fNp,uncr)": null,
+            "Pullout Strength - Cracked Concrete (fNp,cr)": 1118,
+            "Shear Steel Strength (fVsa)": 2005,
+            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 1543,
+            "Pryout Strength - Cracked Concrete (fVcp,cr)": 1093
+          },
+          {
+            "value": 2.5,
+            "Nominal Embedment Depth (hnom)": 2.875,
+            "Minimum Hole Depth (hhole)": 3.0,
+            "Cracked Concrete Data": true,
+            "Seismic Categories": "A-F",
+            "Anchor Category": 1,
+            "Tension Steel Strength (fNsa)": 3855,
+            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 3083,
+            "Tension Breakout Strength - Cracked Concrete (fNcb)": 2184,
+            "Pullout Strength - Uncracked Concrete (fNp,uncr)": 3100,
+            "Pullout Strength - Cracked Concrete (fNp,cr)": 2044,
+            "Shear Steel Strength (fVsa)": 2005,
+            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 6641,
+            "Pryout Strength - Cracked Concrete (fVcp,cr)": 4704
+          }
+        ]
+      }
+    },
+    {
+      "Anchor Size": {
+        "value": "1/2\"",
+        "Drill Bit Diameter": "1/2\"",
+        "Effective Embedment Depth (hef)": [
+          {
+            "value": 2.25,
+            "Nominal Embedment Depth (hnom)": 2.75,
+            "Minimum Hole Depth (hhole)": 3.0,
+            "Cracked Concrete Data": true,
+            "Seismic Categories": "A-F",
+            "Anchor Category": 1,
+            "Tension Steel Strength (fNsa)": 9056,
+            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 2633,
+            "Tension Breakout Strength - Cracked Concrete (fNcb)": 1865,
+            "Pullout Strength - Uncracked Concrete (fNp,uncr)": 2100,
+            "Pullout Strength - Cracked Concrete (fNp,cr)": 1664,
+            "Shear Steel Strength (fVsa)": 4709,
+            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 2835,
+            "Pryout Strength - Cracked Concrete (fVcp,cr)": 2008
+          },
+          {
+            "value": 3.375,
+            "Nominal Embedment Depth (hnom)": 3.875,
+            "Minimum Hole Depth (hhole)": 4.125,
+            "Cracked Concrete Data": true,
+            "Seismic Categories": "A-F",
+            "Anchor Category": 1,
+            "Tension Steel Strength (fNsa)": 9056,
+            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 4836,
+            "Tension Breakout Strength - Cracked Concrete (fNcb)": 3426,
+            "Pullout Strength - Uncracked Concrete (fNp,uncr)": 2922,
+            "Pullout Strength - Cracked Concrete (fNp,cr)": 2798,
+            "Shear Steel Strength (fVsa)": 4709,
+            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 10416,
+            "Pryout Strength - Cracked Concrete (fVcp,cr)": 7378
+          }
+        ]
+      }
+    },
+    {
+      "Anchor Size": {
+        "value": "5/8\"",
+        "Drill Bit Diameter": "5/8\"",
+        "Effective Embedment Depth (hef)": [
+          {
+            "value": 2.75,
+            "Nominal Embedment Depth (hnom)": 3.375,
+            "Minimum Hole Depth (hhole)": 3.625,
+            "Cracked Concrete Data": true,
+            "Seismic Categories": "A-F",
+            "Anchor Category": 1,
+            "Tension Steel Strength (fNsa)": 13448,
+            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 3557,
+            "Tension Breakout Strength - Cracked Concrete (fNcb)": 2520,
+            "Pullout Strength - Uncracked Concrete (fNp,uncr)": null,
+            "Pullout Strength - Cracked Concrete (fNp,cr)": null,
+            "Shear Steel Strength (fVsa)": 4384,
+            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 7661,
+            "Pryout Strength - Cracked Concrete (fVcp,cr)": 5427
+          },
+          {
+            "value": 4.5,
+            "Nominal Embedment Depth (hnom)": 5.125,
+            "Minimum Hole Depth (hhole)": 5.375,
+            "Cracked Concrete Data": true,
+            "Seismic Categories": "A-F",
+            "Anchor Category": 1,
+            "Tension Steel Strength (fNsa)": 13448,
+            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 7446,
+            "Tension Breakout Strength - Cracked Concrete (fNcb)": 5274,
+            "Pullout Strength - Uncracked Concrete (fNp,uncr)": 4950,
+            "Pullout Strength - Cracked Concrete (fNp,cr)": 4254,
+            "Shear Steel Strength (fVsa)": 6994,
+            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 16037,
+            "Pryout Strength - Cracked Concrete (fVcp,cr)": 11360
+          }
+        ]
+      }
+    },
+    {
+      "Anchor Size": {
+        "value": "3/4\"",
+        "Drill Bit Diameter": "3/4\"",
+        "Effective Embedment Depth (hef)": [
+          {
+            "value": 3.375,
+            "Nominal Embedment Depth (hnom)": 4.125,
+            "Minimum Hole Depth (hhole)": 4.375,
+            "Cracked Concrete Data": true,
+            "Seismic Categories": "A-F",
+            "Anchor Category": 1,
+            "Tension Steel Strength (fNsa)": 19238,
+            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 4836,
+            "Tension Breakout Strength - Cracked Concrete (fNcb)": 3426,
+            "Pullout Strength - Uncracked Concrete (fNp,uncr)": 5021,
+            "Pullout Strength - Cracked Concrete (fNp,cr)": null,
+            "Shear Steel Strength (fVsa)": 9779,
+            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 10416,
+            "Pryout Strength - Cracked Concrete (fVcp,cr)": 7378
+          },
+          {
+            "value": 5.0,
+            "Nominal Embedment Depth (hnom)": 5.75,
+            "Minimum Hole Depth (hhole)": 6.0,
+            "Cracked Concrete Data": true,
+            "Seismic Categories": "A-F",
+            "Anchor Category": 1,
+            "Tension Steel Strength (fNsa)": 19238,
+            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 8721,
+            "Tension Breakout Strength - Cracked Concrete (fNcb)": 6177,
+            "Pullout Strength - Uncracked Concrete (fNp,uncr)": 6256,
+            "Pullout Strength - Cracked Concrete (fNp,cr)": 5350,
+            "Shear Steel Strength (fVsa)": 9779,
+            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 18783,
+            "Pryout Strength - Cracked Concrete (fVcp,cr)": 13305
+          }
+        ]
+      }
+    }
+  ]
+}
