@@ -1,5 +1,5 @@
 {
-  "name": "HSL-3, HSL-3-B, HSL-3-SK",
+  "name": "HSL-3-G",
   "company": "Hilti",
   "diameters": [
     {
@@ -19,7 +19,7 @@
             "Tension Breakout Strength - Cracked Concrete (fNcb)": 2003,
             "Pullout Strength - Uncracked Concrete (fNp,uncr)": 2733,
             "Pullout Strength - Cracked Concrete (fNp,cr)": 1826,
-            "Shear Steel Strength (fVsa)": 4705,
+            "Shear Steel Strength (fVsa)": 3946,
             "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 3045,
             "Pryout Strength - Cracked Concrete (fVcp,cr)": 2157
           }
@@ -43,7 +43,7 @@
             "Tension Breakout Strength - Cracked Concrete (fNcb)": 3576,
             "Pullout Strength - Uncracked Concrete (fNp,uncr)": null,
             "Pullout Strength - Cracked Concrete (fNp,cr)": 2922,
-            "Shear Steel Strength (fVsa)": 6649,
+            "Shear Steel Strength (fVsa)": 5450,
             "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 7703,
             "Pryout Strength - Cracked Concrete (fVcp,cr)": 7703
           }
@@ -67,7 +67,7 @@
             "Tension Breakout Strength - Cracked Concrete (fNcb)": 4361,
             "Pullout Strength - Uncracked Concrete (fNp,uncr)": null,
             "Pullout Strength - Cracked Concrete (fNp,cr)": null,
-            "Shear Steel Strength (fVsa)": 9571,
+            "Shear Steel Strength (fVsa)": 7905,
             "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 9392,
             "Pryout Strength - Cracked Concrete (fVcp,cr)": 9392
           }
@@ -91,7 +91,7 @@
             "Tension Breakout Strength - Cracked Concrete (fNcb)": 6100,
             "Pullout Strength - Uncracked Concrete (fNp,uncr)": null,
             "Pullout Strength - Cracked Concrete (fNp,cr)": null,
-            "Shear Steel Strength (fVsa)": 17360,
+            "Shear Steel Strength (fVsa)": 14744,
             "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 13139,
             "Pryout Strength - Cracked Concrete (fVcp,cr)": 13139
           }
@@ -115,7 +115,7 @@
             "Tension Breakout Strength - Cracked Concrete (fNcb)": 8512,
             "Pullout Strength - Uncracked Concrete (fNp,uncr)": null,
             "Pullout Strength - Cracked Concrete (fNp,cr)": null,
-            "Shear Steel Strength (fVsa)": 25689,
+            "Shear Steel Strength (fVsa)": 21553,
             "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 18334,
             "Pryout Strength - Cracked Concrete (fVcp,cr)": 18334
           }
@@ -139,7 +139,7 @@
             "Tension Breakout Strength - Cracked Concrete (fNcb)": 11207,
             "Pullout Strength - Uncracked Concrete (fNp,uncr)": null,
             "Pullout Strength - Cracked Concrete (fNp,cr)": null,
-            "Shear Steel Strength (fVsa)": 29868,
+            "Shear Steel Strength (fVsa)": 28060,
             "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 24137,
             "Pryout Strength - Cracked Concrete (fVcp,cr)": 24137
           }

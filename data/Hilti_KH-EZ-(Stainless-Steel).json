@@ -1,0 +1,163 @@
+{
+  "name": "KH-EZ (Stainless Steel)",
+  "company": "Hilti",
+  "diameters": [
+    {
+      "Anchor Size": {
+        "value": "1/4\"",
+        "Effective Embedment Depth (hef)": [
+          {
+            "value": 1.19,
+            "Drill Bit Diameter": "1/4\"",
+            "Nominal Embedment Depth (hnom)": 1.625,
+            "Minimum Hole Depth (hhole)": 2.0,
+            "Cracked Concrete Data": true,
+            "Seismic Categories": "A-F",
+            "Anchor Category": 2,
+            "Tension Steel Strength (fNsa)": 4590,
+            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 857,
+            "Tension Breakout Strength - Cracked Concrete (fNcb)": 607,
+            "Pullout Strength - Uncracked Concrete (fNp,uncr)": null,
+            "Pullout Strength - Cracked Concrete (fNp,cr)": 314,
+            "Shear Steel Strength (fVsa)": 780,
+            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 1090,
+            "Pryout Strength - Cracked Concrete (fVcp,cr)": 772
+          },
+          {
+            "value": 1.93,
+            "Drill Bit Diameter": "1/4\"",
+            "Nominal Embedment Depth (hnom)": 2.5,
+            "Minimum Hole Depth (hhole)": 2.875,
+            "Cracked Concrete Data": true,
+            "Seismic Categories": "A-F",
+            "Anchor Category": 3,
+            "Tension Steel Strength (fNsa)": 4590,
+            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 1448,
+            "Tension Breakout Strength - Cracked Concrete (fNcb)": 1026,
+            "Pullout Strength - Uncracked Concrete (fNp,uncr)": null,
+            "Pullout Strength - Cracked Concrete (fNp,cr)": 495,
+            "Shear Steel Strength (fVsa)": 780,
+            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 2252,
+            "Pryout Strength - Cracked Concrete (fVcp,cr)": 1595
+          }
+        ]
+      }
+    },
+    {
+      "Anchor Size": {
+        "value": "3/8\"",
+        "Effective Embedment Depth (hef)": [
+          {
+            "value": 1.49,
+            "Drill Bit Diameter": "3/8\"",
+            "Nominal Embedment Depth (hnom)": 2.0,
+            "Minimum Hole Depth (hhole)": 2.25,
+            "Cracked Concrete Data": true,
+            "Seismic Categories": "A-F",
+            "Anchor Category": 1,
+            "Tension Steel Strength (fNsa)": 9821,
+            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 1596,
+            "Tension Breakout Strength - Cracked Concrete (fNcb)": 1005,
+            "Pullout Strength - Uncracked Concrete (fNp,uncr)": null,
+            "Pullout Strength - Cracked Concrete (fNp,cr)": 982,
+            "Shear Steel Strength (fVsa)": 2831,
+            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 1719,
+            "Pryout Strength - Cracked Concrete (fVcp,cr)": 1082
+          },
+          {
+            "value": 1.92,
+            "Drill Bit Diameter": "3/8\"",
+            "Nominal Embedment Depth (hnom)": 2.5,
+            "Minimum Hole Depth (hhole)": 2.75,
+            "Cracked Concrete Data": true,
+            "Seismic Categories": "A-F",
+            "Anchor Category": 1,
+            "Tension Steel Strength (fNsa)": 9821,
+            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 2335,
+            "Tension Breakout Strength - Cracked Concrete (fNcb)": 1470,
+            "Pullout Strength - Uncracked Concrete (fNp,uncr)": null,
+            "Pullout Strength - Cracked Concrete (fNp,cr)": 1440,
+            "Shear Steel Strength (fVsa)": 2831,
+            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 2514,
+            "Pryout Strength - Cracked Concrete (fVcp,cr)": 1583
+          },
+          {
+            "value": 2.55,
+            "Drill Bit Diameter": "3/8\"",
+            "Nominal Embedment Depth (hnom)": 3.25,
+            "Minimum Hole Depth (hhole)": 3.5,
+            "Cracked Concrete Data": true,
+            "Seismic Categories": "A-F",
+            "Anchor Category": 1,
+            "Tension Steel Strength (fNsa)": 9821,
+            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 3573,
+            "Tension Breakout Strength - Cracked Concrete (fNcb)": 2250,
+            "Pullout Strength - Uncracked Concrete (fNp,uncr)": null,
+            "Pullout Strength - Cracked Concrete (fNp,cr)": null,
+            "Shear Steel Strength (fVsa)": 2831,
+            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 7696,
+            "Pryout Strength - Cracked Concrete (fVcp,cr)": 4846
+          }
+        ]
+      }
+    },
+    {
+      "Anchor Size": {
+        "value": "1/2\"",
+        "Effective Embedment Depth (hef)": [
+          {
+            "value": 1.56,
+            "Drill Bit Diameter": "1/2\"",
+            "Nominal Embedment Depth (hnom)": 2.25,
+            "Minimum Hole Depth (hhole)": 2.625,
+            "Cracked Concrete Data": true,
+            "Seismic Categories": "A-F",
+            "Anchor Category": 2,
+            "Tension Steel Strength (fNsa)": 15491,
+            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 1447,
+            "Tension Breakout Strength - Cracked Concrete (fNcb)": 1125,
+            "Pullout Strength - Uncracked Concrete (fNp,uncr)": null,
+            "Pullout Strength - Cracked Concrete (fNp,cr)": null,
+            "Shear Steel Strength (fVsa)": 3114,
+            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 1841,
+            "Pryout Strength - Cracked Concrete (fVcp,cr)": 1432
+          },
+          {
+            "value": 2.2,
+            "Drill Bit Diameter": "1/2\"",
+            "Nominal Embedment Depth (hnom)": 3.0,
+            "Minimum Hole Depth (hhole)": 3.375,
+            "Cracked Concrete Data": true,
+            "Seismic Categories": "A-F",
+            "Anchor Category": 2,
+            "Tension Steel Strength (fNsa)": 15491,
+            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 2423,
+            "Tension Breakout Strength - Cracked Concrete (fNcb)": 1884,
+            "Pullout Strength - Uncracked Concrete (fNp,uncr)": null,
+            "Pullout Strength - Cracked Concrete (fNp,cr)": null,
+            "Shear Steel Strength (fVsa)": 3114,
+            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 3084,
+            "Pryout Strength - Cracked Concrete (fVcp,cr)": 2398
+          },
+          {
+            "value": 3.26,
+            "Drill Bit Diameter": "1/2\"",
+            "Nominal Embedment Depth (hnom)": 4.25,
+            "Minimum Hole Depth (hhole)": 4.625,
+            "Cracked Concrete Data": true,
+            "Seismic Categories": "A-F",
+            "Anchor Category": 2,
+            "Tension Steel Strength (fNsa)": 15491,
+            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 4370,
+            "Tension Breakout Strength - Cracked Concrete (fNcb)": 3399,
+            "Pullout Strength - Uncracked Concrete (fNp,uncr)": null,
+            "Pullout Strength - Cracked Concrete (fNp,cr)": null,
+            "Shear Steel Strength (fVsa)": 3114,
+            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 11125,
+            "Pryout Strength - Cracked Concrete (fVcp,cr)": 8653
+          }
+        ]
+      }
+    }
+  ]
+}

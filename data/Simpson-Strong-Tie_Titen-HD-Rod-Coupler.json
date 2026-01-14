@@ -1,0 +1,54 @@
+{
+  "name": "Titen HD Rod Coupler",
+  "company": "Simpson Strong-Tie",
+  "diameters": [
+    {
+      "Anchor Size": {
+        "value": "3/8\"",
+        "Effective Embedment Depth (hef)": [
+          {
+            "value": 2.4,
+            "Drill Bit Diameter": "3/8\"",
+            "Nominal Embedment Depth (hnom)": 3.25,
+            "Minimum Hole Depth (hhole)": 3.5,
+            "Cracked Concrete Data": true,
+            "Seismic Categories": "A-F",
+            "Anchor Category": 1,
+            "Tension Steel Strength (fNsa)": 7078,
+            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 2900,
+            "Tension Breakout Strength - Cracked Concrete (fNcb)": 2054,
+            "Pullout Strength - Uncracked Concrete (fNp,uncr)": null,
+            "Pullout Strength - Cracked Concrete (fNp,cr)": 1755,
+            "Shear Steel Strength (fVsa)": null,
+            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": null,
+            "Pryout Strength - Cracked Concrete (fVcp,cr)": null
+          }
+        ]
+      }
+    },
+    {
+      "Anchor Size": {
+        "value": "1/2\"",
+        "Effective Embedment Depth (hef)": [
+          {
+            "value": 2.99,
+            "Drill Bit Diameter": "1/2\"",
+            "Nominal Embedment Depth (hnom)": 4.0,
+            "Minimum Hole Depth (hhole)": 4.5,
+            "Cracked Concrete Data": true,
+            "Seismic Categories": "A-F",
+            "Anchor Category": 1,
+            "Tension Steel Strength (fNsa)": 13084,
+            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 4033,
+            "Tension Breakout Strength - Cracked Concrete (fNcb)": 2857,
+            "Pullout Strength - Uncracked Concrete (fNp,uncr)": null,
+            "Pullout Strength - Cracked Concrete (fNp,cr)": null,
+            "Shear Steel Strength (fVsa)": null,
+            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": null,
+            "Pryout Strength - Cracked Concrete (fVcp,cr)": null
+          }
+        ]
+      }
+    }
+  ]
+}

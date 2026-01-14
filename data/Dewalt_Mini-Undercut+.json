@@ -1,0 +1,30 @@
+{
+  "name": "Mini-Undercut+",
+  "company": "Dewalt",
+  "diameters": [
+    {
+      "Anchor Size": {
+        "value": "3/8\"",
+        "Effective Embedment Depth (hef)": [
+          {
+            "value": 0.75,
+            "Drill Bit Diameter": "5/8\"",
+            "Nominal Embedment Depth (hnom)": 0.75,
+            "Minimum Hole Depth (hhole)": 0.75,
+            "Cracked Concrete Data": true,
+            "Seismic Categories": "A-F",
+            "Anchor Category": 1,
+            "Tension Steel Strength (fNsa)": 2717,
+            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 312,
+            "Tension Breakout Strength - Cracked Concrete (fNcb)": 221,
+            "Pullout Strength - Uncracked Concrete (fNp,uncr)": null,
+            "Pullout Strength - Cracked Concrete (fNp,cr)": 182,
+            "Shear Steel Strength (fVsa)": 537,
+            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 351,
+            "Pryout Strength - Cracked Concrete (fVcp,cr)": 248
+          }
+        ]
+      }
+    }
+  ]
+}
