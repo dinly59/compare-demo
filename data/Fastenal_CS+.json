@@ -1,0 +1,54 @@
+{
+  "name": "CS+",
+  "company": "Fastenal",
+  "diameters": [
+    {
+      "Anchor Size": {
+        "value": "3/16\"",
+        "Effective Embedment Depth (hef)": [
+          {
+            "value": 1.28,
+            "Drill Bit Diameter": "5/32\"",
+            "Nominal Embedment Depth (hnom)": 1.75,
+            "Minimum Hole Depth (hhole)": 2.0,
+            "Cracked Concrete Data": false,
+            "Seismic Categories": "A-B",
+            "Anchor Category": 1,
+            "Tension Steel Strength (fNsa)": 1130,
+            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 1130,
+            "Tension Breakout Strength - Cracked Concrete (fNcb)": null,
+            "Pullout Strength - Uncracked Concrete (fNp,uncr)": 659,
+            "Pullout Strength - Cracked Concrete (fNp,cr)": null,
+            "Shear Steel Strength (fVsa)": null,
+            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 1216,
+            "Pryout Strength - Cracked Concrete (fVcp,cr)": null
+          }
+        ]
+      }
+    },
+    {
+      "Anchor Size": {
+        "value": "1/4\"",
+        "Effective Embedment Depth (hef)": [
+          {
+            "value": 1.23,
+            "Drill Bit Diameter": "3/16\"",
+            "Nominal Embedment Depth (hnom)": 1.75,
+            "Minimum Hole Depth (hhole)": 2.0,
+            "Cracked Concrete Data": false,
+            "Seismic Categories": "A-B",
+            "Anchor Category": 1,
+            "Tension Steel Strength (fNsa)": 1869,
+            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 1064,
+            "Tension Breakout Strength - Cracked Concrete (fNcb)": null,
+            "Pullout Strength - Uncracked Concrete (fNp,uncr)": 911,
+            "Pullout Strength - Cracked Concrete (fNp,cr)": null,
+            "Shear Steel Strength (fVsa)": null,
+            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 1146,
+            "Pryout Strength - Cracked Concrete (fVcp,cr)": null
+          }
+        ]
+      }
+    }
+  ]
+}

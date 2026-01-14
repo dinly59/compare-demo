@@ -5,10 +5,10 @@
     {
       "Anchor Size": {
         "value": "1/2\"",
-        "Drill Bit Diameter": "1/2\"",
         "Effective Embedment Depth (hef)": [
           {
             "value": 2.625,
+            "Drill Bit Diameter": "1/2\"",
             "Nominal Embedment Depth (hnom)": 3.25,
             "Minimum Hole Depth (hhole)": 3.75,
             "Cracked Concrete Data": true,
@@ -19,7 +19,7 @@
             "Tension Breakout Strength - Cracked Concrete (fNcb)": 2350,
             "Pullout Strength - Uncracked Concrete (fNp,uncr)": null,
             "Pullout Strength - Cracked Concrete (fNp,cr)": null,
-            "Shear Steel Strength (fVsa)": 3903,
+            "Shear Steel Strength (fVsa)": 2967,
             "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 8038,
             "Pryout Strength - Cracked Concrete (fVcp,cr)": 5061
           }
@@ -29,10 +29,10 @@
     {
       "Anchor Size": {
         "value": "5/8\"",
-        "Drill Bit Diameter": "5/8\"",
         "Effective Embedment Depth (hef)": [
           {
             "value": 3.0,
+            "Drill Bit Diameter": "5/8\"",
             "Nominal Embedment Depth (hnom)": 3.75,
             "Minimum Hole Depth (hhole)": 4.25,
             "Cracked Concrete Data": true,
@@ -43,7 +43,7 @@
             "Tension Breakout Strength - Cracked Concrete (fNcb)": 2871,
             "Pullout Strength - Uncracked Concrete (fNp,uncr)": null,
             "Pullout Strength - Cracked Concrete (fNp,cr)": null,
-            "Shear Steel Strength (fVsa)": 8720,
+            "Shear Steel Strength (fVsa)": 4826,
             "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 9821,
             "Pryout Strength - Cracked Concrete (fVcp,cr)": 6183
           }
@@ -53,10 +53,10 @@
     {
       "Anchor Size": {
         "value": "3/4\"",
-        "Drill Bit Diameter": "3/4\"",
         "Effective Embedment Depth (hef)": [
           {
             "value": 3.5,
+            "Drill Bit Diameter": "3/4\"",
             "Nominal Embedment Depth (hnom)": 4.375,
             "Minimum Hole Depth (hhole)": 5.0,
             "Cracked Concrete Data": true,

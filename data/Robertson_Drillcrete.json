@@ -1,0 +1,54 @@
+{
+  "name": "Drillcrete",
+  "company": "Robertson",
+  "diameters": [
+    {
+      "Anchor Size": {
+        "value": "3/16\"",
+        "Effective Embedment Depth (hef)": [
+          {
+            "value": 1.5,
+            "Drill Bit Diameter": "5/32\"",
+            "Nominal Embedment Depth (hnom)": 1.97,
+            "Minimum Hole Depth (hhole)": 2.22,
+            "Cracked Concrete Data": false,
+            "Seismic Categories": "A-B",
+            "Anchor Category": 1,
+            "Tension Steel Strength (fNsa)": 1121,
+            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 1433,
+            "Tension Breakout Strength - Cracked Concrete (fNcb)": null,
+            "Pullout Strength - Uncracked Concrete (fNp,uncr)": 325,
+            "Pullout Strength - Cracked Concrete (fNp,cr)": null,
+            "Shear Steel Strength (fVsa)": null,
+            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 1543,
+            "Pryout Strength - Cracked Concrete (fVcp,cr)": null
+          }
+        ]
+      }
+    },
+    {
+      "Anchor Size": {
+        "value": "1/4\"",
+        "Effective Embedment Depth (hef)": [
+          {
+            "value": 1.5,
+            "Drill Bit Diameter": "3/16\"",
+            "Nominal Embedment Depth (hnom)": 2.03,
+            "Minimum Hole Depth (hhole)": 2.28,
+            "Cracked Concrete Data": false,
+            "Seismic Categories": "A-B",
+            "Anchor Category": 1,
+            "Tension Steel Strength (fNsa)": 1934,
+            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 1433,
+            "Tension Breakout Strength - Cracked Concrete (fNcb)": null,
+            "Pullout Strength - Uncracked Concrete (fNp,uncr)": null,
+            "Pullout Strength - Cracked Concrete (fNp,cr)": null,
+            "Shear Steel Strength (fVsa)": null,
+            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 1543,
+            "Pryout Strength - Cracked Concrete (fVcp,cr)": null
+          }
+        ]
+      }
+    }
+  ]
+}

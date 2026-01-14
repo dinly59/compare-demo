@@ -1,6 +1,6 @@
 {
-  "name": "Sure-Wedge (Carbon Steel)",
-  "company": "Aerosmith Fastening Systems",
+  "name": "Index MTD-X",
+  "company": "Tecnicas Expansivas",
   "diameters": [
     {
       "Anchor Size": {
@@ -121,13 +121,13 @@
             "Seismic Categories": "A-F",
             "Anchor Category": 1,
             "Tension Steel Strength (fNsa)": 12180,
-            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 6240,
-            "Tension Breakout Strength - Cracked Concrete (fNcb)": 4420,
+            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 3557,
+            "Tension Breakout Strength - Cracked Concrete (fNcb)": 2520,
             "Pullout Strength - Uncracked Concrete (fNp,uncr)": null,
             "Pullout Strength - Cracked Concrete (fNp,cr)": null,
             "Shear Steel Strength (fVsa)": 5876,
-            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 13440,
-            "Pryout Strength - Cracked Concrete (fVcp,cr)": 9520
+            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 7661,
+            "Pryout Strength - Cracked Concrete (fVcp,cr)": 5427
           }
         ]
       }

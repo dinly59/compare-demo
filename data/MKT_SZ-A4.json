@@ -5,10 +5,10 @@
     {
       "Anchor Size": {
         "value": "M8",
-        "Drill Bit Diameter": "12 mm",
         "Effective Embedment Depth (hef)": [
           {
             "value": 2.4,
+            "Drill Bit Diameter": "12 mm",
             "Nominal Embedment Depth (hnom)": 2.72,
             "Minimum Hole Depth (hhole)": 3.15,
             "Cracked Concrete Data": true,
@@ -19,7 +19,7 @@
             "Tension Breakout Strength - Cracked Concrete (fNcb)": 2054,
             "Pullout Strength - Uncracked Concrete (fNp,uncr)": 2340,
             "Pullout Strength - Cracked Concrete (fNp,cr)": 1755,
-            "Shear Steel Strength (fVsa)": 3278,
+            "Shear Steel Strength (fVsa)": 1295,
             "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 3123,
             "Pryout Strength - Cracked Concrete (fVcp,cr)": 2212
           }
@@ -29,10 +29,10 @@
     {
       "Anchor Size": {
         "value": "M10",
-        "Drill Bit Diameter": "15 mm",
         "Effective Embedment Depth (hef)": [
           {
             "value": 2.8,
+            "Drill Bit Diameter": "15 mm",
             "Nominal Embedment Depth (hnom)": 3.25,
             "Minimum Hole Depth (hhole)": 3.74,
             "Cracked Concrete Data": true,
@@ -43,7 +43,7 @@
             "Tension Breakout Strength - Cracked Concrete (fNcb)": 2589,
             "Pullout Strength - Uncracked Concrete (fNp,uncr)": 3640,
             "Pullout Strength - Cracked Concrete (fNp,cr)": 2340,
-            "Shear Steel Strength (fVsa)": 4964,
+            "Shear Steel Strength (fVsa)": 1807,
             "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 7871,
             "Pryout Strength - Cracked Concrete (fVcp,cr)": 5576
           }
@@ -53,10 +53,10 @@
     {
       "Anchor Size": {
         "value": "M12",
-        "Drill Bit Diameter": "18 mm",
         "Effective Embedment Depth (hef)": [
           {
             "value": 3.1,
+            "Drill Bit Diameter": "18 mm",
             "Nominal Embedment Depth (hnom)": 3.72,
             "Minimum Hole Depth (hhole)": 4.13,
             "Cracked Concrete Data": true,
@@ -67,7 +67,7 @@
             "Tension Breakout Strength - Cracked Concrete (fNcb)": 3016,
             "Pullout Strength - Uncracked Concrete (fNp,uncr)": null,
             "Pullout Strength - Cracked Concrete (fNp,cr)": null,
-            "Shear Steel Strength (fVsa)": 8201,
+            "Shear Steel Strength (fVsa)": 3291,
             "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 9170,
             "Pryout Strength - Cracked Concrete (fVcp,cr)": 6495
           }
@@ -77,10 +77,10 @@
     {
       "Anchor Size": {
         "value": "M16",
-        "Drill Bit Diameter": "24 mm",
         "Effective Embedment Depth (hef)": [
           {
             "value": 3.9,
+            "Drill Bit Diameter": "24 mm",
             "Nominal Embedment Depth (hnom)": 4.67,
             "Minimum Hole Depth (hhole)": 5.12,
             "Cracked Concrete Data": true,
@@ -91,7 +91,7 @@
             "Tension Breakout Strength - Cracked Concrete (fNcb)": 6007,
             "Pullout Strength - Uncracked Concrete (fNp,uncr)": null,
             "Pullout Strength - Cracked Concrete (fNp,cr)": null,
-            "Shear Steel Strength (fVsa)": 11978,
+            "Shear Steel Strength (fVsa)": 9590,
             "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 14557,
             "Pryout Strength - Cracked Concrete (fVcp,cr)": 12939
           }
