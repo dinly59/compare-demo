@@ -14,14 +14,14 @@
             "Cracked Concrete Data": false,
             "Seismic Categories": "A-B",
             "Anchor Category": 1,
-            "Tension Steel Strength (fNsa)": 1702,
-            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 1433,
-            "Tension Breakout Strength - Cracked Concrete (fNcb)": null,
-            "Pullout Strength - Uncracked Concrete (fNp,uncr)": 774,
-            "Pullout Strength - Cracked Concrete (fNp,cr)": null,
-            "Shear Steel Strength (fVsa)": 682,
-            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 1543,
-            "Pryout Strength - Cracked Concrete (fVcp,cr)": null
+            "Tension Steel Strength (φNsa)": 1702,
+            "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 1433,
+            "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": null,
+            "Pullout Strength - Uncracked Concrete (φNp,uncr)": 774,
+            "Pullout Strength - Cracked Concrete (φNp,cr)": null,
+            "Shear Steel Strength (φVsa)": 682,
+            "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 1543,
+            "Pryout Strength - Cracked Concrete (φVcp,cr)": null
           }
         ]
       }
@@ -38,14 +38,14 @@
             "Cracked Concrete Data": true,
             "Seismic Categories": "A-F",
             "Anchor Category": 1,
-            "Tension Steel Strength (fNsa)": 4080,
-            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 2633,
-            "Tension Breakout Strength - Cracked Concrete (fNcb)": 1865,
-            "Pullout Strength - Uncracked Concrete (fNp,uncr)": 1911,
-            "Pullout Strength - Cracked Concrete (fNp,cr)": 864,
-            "Shear Steel Strength (fVsa)": 1190,
-            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 2835,
-            "Pryout Strength - Cracked Concrete (fVcp,cr)": 2008
+            "Tension Steel Strength (φNsa)": 4080,
+            "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 2633,
+            "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 1865,
+            "Pullout Strength - Uncracked Concrete (φNp,uncr)": 1911,
+            "Pullout Strength - Cracked Concrete (φNp,cr)": 864,
+            "Shear Steel Strength (φVsa)": 1190,
+            "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 2835,
+            "Pryout Strength - Cracked Concrete (φVcp,cr)": 2008
           }
         ]
       }
@@ -62,14 +62,14 @@
             "Cracked Concrete Data": true,
             "Seismic Categories": "A-F",
             "Anchor Category": 1,
-            "Tension Steel Strength (fNsa)": 7552,
-            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 2633,
-            "Tension Breakout Strength - Cracked Concrete (fNcb)": 1865,
-            "Pullout Strength - Uncracked Concrete (fNp,uncr)": null,
-            "Pullout Strength - Cracked Concrete (fNp,cr)": 702,
-            "Shear Steel Strength (fVsa)": 2346,
-            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 2835,
-            "Pryout Strength - Cracked Concrete (fVcp,cr)": 2008
+            "Tension Steel Strength (φNsa)": 7552,
+            "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 2633,
+            "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 1865,
+            "Pullout Strength - Uncracked Concrete (φNp,uncr)": null,
+            "Pullout Strength - Cracked Concrete (φNp,cr)": 702,
+            "Shear Steel Strength (φVsa)": 2346,
+            "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 2835,
+            "Pryout Strength - Cracked Concrete (φVcp,cr)": 2008
           }
         ]
       }
@@ -86,14 +86,14 @@
             "Cracked Concrete Data": true,
             "Seismic Categories": "A-F",
             "Anchor Category": 1,
-            "Tension Steel Strength (fNsa)": 14025,
-            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 4002,
-            "Tension Breakout Strength - Cracked Concrete (fNcb)": 3557,
-            "Pullout Strength - Uncracked Concrete (fNp,uncr)": null,
-            "Pullout Strength - Cracked Concrete (fNp,cr)": 2847,
-            "Shear Steel Strength (fVsa)": 4004,
-            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 8619,
-            "Pryout Strength - Cracked Concrete (fVcp,cr)": 7661
+            "Tension Steel Strength (φNsa)": 14025,
+            "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 4002,
+            "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 3557,
+            "Pullout Strength - Uncracked Concrete (φNp,uncr)": null,
+            "Pullout Strength - Cracked Concrete (φNp,cr)": 2847,
+            "Shear Steel Strength (φVsa)": 4004,
+            "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 8619,
+            "Pryout Strength - Cracked Concrete (φVcp,cr)": 7661
           }
         ]
       }
@@ -110,14 +110,14 @@
             "Cracked Concrete Data": true,
             "Seismic Categories": "A-F",
             "Anchor Category": 1,
-            "Tension Steel Strength (fNsa)": 20048,
-            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 4570,
-            "Tension Breakout Strength - Cracked Concrete (fNcb)": 3999,
-            "Pullout Strength - Uncracked Concrete (fNp,uncr)": null,
-            "Pullout Strength - Cracked Concrete (fNp,cr)": null,
-            "Shear Steel Strength (fVsa)": 8248,
-            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 9843,
-            "Pryout Strength - Cracked Concrete (fVcp,cr)": 8613
+            "Tension Steel Strength (φNsa)": 20048,
+            "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 4570,
+            "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 3999,
+            "Pullout Strength - Uncracked Concrete (φNp,uncr)": null,
+            "Pullout Strength - Cracked Concrete (φNp,cr)": null,
+            "Shear Steel Strength (φVsa)": 8248,
+            "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 9843,
+            "Pryout Strength - Cracked Concrete (φVcp,cr)": 8613
           }
         ]
       }
