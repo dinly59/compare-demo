@@ -14,14 +14,14 @@
             "Cracked Concrete Data": true,
             "Seismic Categories": "A-F",
             "Anchor Category": 1,
-            "Tension Steel Strength (fNsa)": 3334,
-            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 6834,
-            "Tension Breakout Strength - Cracked Concrete (fNcb)": 4841,
-            "Pullout Strength - Uncracked Concrete (fNp,uncr)": null,
-            "Pullout Strength - Cracked Concrete (fNp,cr)": null,
-            "Shear Steel Strength (fVsa)": 1732,
-            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 14719,
-            "Pryout Strength - Cracked Concrete (fVcp,cr)": 10426
+            "Tension Steel Strength (φNsa)": 3334,
+            "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 6834,
+            "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 4841,
+            "Pullout Strength - Uncracked Concrete (φNp,uncr)": null,
+            "Pullout Strength - Cracked Concrete (φNp,cr)": null,
+            "Shear Steel Strength (φVsa)": 1732,
+            "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 14719,
+            "Pryout Strength - Cracked Concrete (φVcp,cr)": 10426
           }
         ]
       }
@@ -38,14 +38,14 @@
             "Cracked Concrete Data": true,
             "Seismic Categories": "A-F",
             "Anchor Category": 2,
-            "Tension Steel Strength (fNsa)": 6068,
-            "Tension Breakout Strength - Uncracked Concrete (fNcb)": 11464,
-            "Tension Breakout Strength - Cracked Concrete (fNcb)": 8120,
-            "Pullout Strength - Uncracked Concrete (fNp,uncr)": null,
-            "Pullout Strength - Cracked Concrete (fNp,cr)": null,
-            "Shear Steel Strength (fVsa)": 3156,
-            "Pryout Strength - Uncracked Concrete (fVcp,uncr)": 24691,
-            "Pryout Strength - Cracked Concrete (fVcp,cr)": 17489
+            "Tension Steel Strength (φNsa)": 6068,
+            "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)": 11464,
+            "Tension Breakout Strength - Cracked Concrete (φNcb,cr)": 8120,
+            "Pullout Strength - Uncracked Concrete (φNp,uncr)": null,
+            "Pullout Strength - Cracked Concrete (φNp,cr)": null,
+            "Shear Steel Strength (φVsa)": 3156,
+            "Pryout Strength - Uncracked Concrete (φVcp,uncr)": 24691,
+            "Pryout Strength - Cracked Concrete (φVcp,cr)": 17489
           }
         ]
       }

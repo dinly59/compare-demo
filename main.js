@@ -1,14 +1,6 @@
 const DATA_PATH = "./data/";
-const PRODUCTS = [
-  "Aerosmith-Fastening-Systems_Sure-Wedge-(Carbon-Steel).json",
-  "Dewalt_Power-Bolt+.json",
-  "Dewalt_Power-Stud-+-SD1.json",
-  "Hilti_HSL-3,-HSL-3-B,-HSL-3-SK.json",
-  "MKT_SZ-A4.json",
-  "MKT_SZ.json",
-  "Simpson-Strong-Tie_Strong-Bolt-2-(Carbon-Steel).json",
-  "Simpson-Strong-Tie_Strong-Bolt-2-(Stainless-Steel).json",
-];
+const PRODUCTS_URL = DATA_PATH + "index.json";
+let PRODUCTS = [];
 
 // View management
 const views = {
@@ -33,7 +25,6 @@ function showView(viewName) {
 function handleRoute() {
   const hash = window.location.hash.slice(1) || "home";
   showView(hash);
-
   // Auto-load first product when entering table view
   if (hash === "table" && !cachedData && PRODUCTS.length) {
     loadProduct(PRODUCTS[0]).then((d) => renderTable(d));
@@ -42,7 +33,10 @@ function handleRoute() {
 
 // Initialize routing
 window.addEventListener("hashchange", handleRoute);
-window.addEventListener("load", handleRoute);
+window.addEventListener("load", async () => {
+  await initProducts();
+  handleRoute();
+});
 
 const productSelect = document.getElementById("productSelect");
 const container = document.getElementById("tableContainer");
@@ -91,10 +85,96 @@ function populateCompareSelects() {
   });
 }
 
+async function fetchProductList() {
+  try {
+    const resp = await fetch(PRODUCTS_URL);
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const list = await resp.json();
+    if (!Array.isArray(list)) return [];
+    return list;
+  } catch (e) {
+    console.error("Failed to fetch product list:", e);
+    return [];
+  }
+}
+
+async function initProducts() {
+  PRODUCTS = await fetchProductList();
+  // Fallback: if no index provided, keep PRODUCTS empty and let user add manually
+  populateSelect();
+  populateCompareSelects();
+}
+
 function formatNumber(v) {
   if (v === null || v === undefined) return "-";
   if (typeof v === "number") return v.toLocaleString();
   return String(v);
+}
+
+// Normalize keys to compare variants like "φNsa", "ϕNsa", "fNsa", or full labels
+function normalizeKey(s) {
+  if (s == null) return "";
+  return String(s)
+    .normalize()
+    .replace(/\s+/g, "")
+    .replace(/[(),\-_.]/g, "")
+    .replace(/[φϕ]/g, "phi")
+    .toLowerCase();
+}
+
+// Lookup by short φ-key (e.g. 'φVcp_cr', 'φNsa').
+// Matches exact keys, normalized keys, and parenthetical tokens like '(φVcp,cr)'.
+function getPhi(obj, phiKey) {
+  if (!obj || !phiKey) return undefined;
+  // direct exact property
+  if (Object.prototype.hasOwnProperty.call(obj, phiKey)) return obj[phiKey];
+
+  const target = normalizeKey(phiKey);
+
+  const props = Object.keys(obj);
+  for (const p of props) {
+    // exact normalized match
+    if (normalizeKey(p) === target) return obj[p];
+    // parenthetical token match
+    const m = p.match(/\(([^)]+)\)/);
+    if (m && m[1]) {
+      const par = normalizeKey(m[1]);
+      if (par === target) return obj[p];
+      if (par.includes(target)) return obj[p];
+    }
+    // also check if the property contains the token somewhere
+    if (normalizeKey(p).includes(target)) return obj[p];
+  }
+  return undefined;
+}
+
+function getField(obj, candidates = []) {
+  if (!obj) return undefined;
+  // direct candidate check
+  for (const c of candidates) {
+    if (Object.prototype.hasOwnProperty.call(obj, c)) return obj[c];
+  }
+  // normalized & substring fallback (handles parenthetical codes like (φNsa))
+  const props = Object.keys(obj);
+  for (const p of props) {
+    const np = normalizeKey(p);
+    for (const c of candidates) {
+      const nc = normalizeKey(c);
+      if (!nc) continue;
+      // exact normalized match
+      if (np === nc) return obj[p];
+      // if the normalized prop contains the candidate token (e.g., 'phinsa')
+      if (np.includes(nc)) return obj[p];
+      // check parenthetical token inside the original property name
+      const m = p.match(/\(([^)]+)\)/);
+      if (m && m[1]) {
+        const par = normalizeKey(m[1]);
+        if (par === nc) return obj[p];
+        if (par.includes(nc)) return obj[p];
+      }
+    }
+  }
+  return undefined;
 }
 
 function showLoading() {
@@ -111,14 +191,14 @@ function showLoading() {
 
 function showError(message) {
   container.innerHTML = `
-		<div class="error">
+    <div class="error">
       <svg class="inline-block w-16 h-16 text-red-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
-			<p class="text-lg font-semibold">⚠️ ${message}</p>
-			<button onclick="location.reload()">Retry</button>
-		</div>
-	`;
+      <p class="text-lg font-semibold">⚠️ ${message}</p>
+      <button onclick="location.reload()">Retry</button>
+    </div>
+  `;
 }
 
 function renderTable(data, filter = "") {
@@ -155,14 +235,14 @@ function renderTable(data, filter = "") {
     "Cracked",
     "Seismic",
     "Category",
-    "fNsa",
-    "fNcb",
-    "fNcb_cr",
-    "fNp_uncr",
-    "fNp_cr",
-    "fVsa",
-    "fVcp_uncr",
-    "fVcp_cr",
+    "φNsa",
+    "φNcb",
+    "φNcb_cr",
+    "φNp_uncr",
+    "φNp_cr",
+    "φVsa",
+    "φVcp_uncr",
+    "φVcp_cr",
   ];
   headers.forEach((h, idx) => {
     const th = document.createElement("th");
@@ -201,45 +281,77 @@ function renderTable(data, filter = "") {
         h["Seismic Categories"] || h.Seismic || "-",
         h["Anchor Category"] || h.Anchor || "-",
         formatNumber(
-          h["Tension Steel Strength (fNsa)"] || h.fNsa || h.tensionSteelStrength
+          getField(h, [
+            "Tension Steel Strength (φNsa)",
+
+            "tensionSteelStrength",
+            "φNsa",
+            "ϕNsa",
+          ])
         ),
         formatNumber(
-          h["Tension Breakout Strength - Uncracked Concrete (fNcb)"] ||
-            h.fNcb ||
-            h.fNcb_uncr
+          getField(h, [
+            "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)",
+
+            "φNcb",
+            "ϕNcb",
+          ])
         ),
         formatNumber(
-          h["Tension Breakout Strength - Cracked Concrete (fNcb)"] ||
-            h.fNcb_cr ||
-            h.fNcb_cr
+          getField(h, [
+            "Tension Breakout Strength - Cracked Concrete (φNcb,cr)",
+
+            "φNcb_cr",
+            "φNcb,cr",
+          ])
         ),
         formatNumber(
-          h["Pullout Strength - Uncracked Concrete (fNp,uncr)"] ||
-            h.fNp_uncr ||
-            h.fNp
+          getField(h, [
+            "Pullout Strength - Uncracked Concrete (φNp,uncr)",
+
+            "φNp",
+            "ϕNp",
+          ])
         ),
         formatNumber(
-          h["Pullout Strength - Cracked Concrete (fNp,cr)"] ||
-            h.fNp_cr ||
-            h.fNp_cr
+          getField(h, [
+            "Pullout Strength - Cracked Concrete (φNp,cr)",
+
+            "φNp_cr",
+            "φNp,cr",
+          ])
         ),
         formatNumber(
-          h["Shear Steel Strength (fVsa)"] || h.fVsa || h.shearSteelStrength
+          getField(h, [
+            "Shear Steel Strength (φVsa)",
+
+            "shearSteelStrength",
+            "φVsa",
+            "ϕVsa",
+          ])
         ),
         formatNumber(
-          h["Pryout Strength - Uncracked Concrete (fVcp,uncr)"] ||
-            h.fVcp_uncr ||
-            h.fVcp
+          getField(h, [
+            "Pryout Strength - Uncracked Concrete (φVcp,uncr)",
+
+            "φVcp",
+            "φVcp_uncr",
+          ])
         ),
         formatNumber(
-          h["Pryout Strength - Cracked Concrete (fVcp,cr)"] ||
-            h.fVcp_cr ||
-            h.fVcp_cr
+          getField(h, [
+            "Pryout Strength - Cracked Concrete (φVcp,cr)",
+
+            "φVcp_cr",
+            "φVcp,cr",
+          ])
         ),
       ];
 
-      const rowText = cells.join(" ").toLowerCase();
-      if (filter && !rowText.includes(filter.toLowerCase())) return;
+      // Normalize row text and filter to support searching for φ/ϕ and other variants
+      const rowText = normalizeKey(cells.join(" "));
+      const normalizedFilter = normalizeKey(filter || "");
+      if (normalizedFilter && !rowText.includes(normalizedFilter)) return;
 
       headers.forEach((hdr, i) => {
         const td = document.createElement("td");
@@ -361,8 +473,6 @@ async function loadProduct(filename) {
     throw e;
   }
 }
-
-populateSelect();
 
 productSelect.addEventListener("change", async () => {
   const file = productSelect.value;
@@ -562,7 +672,8 @@ function renderComparison(productsData) {
 
     // Create chart containers
     const chartsGrid = document.createElement("div");
-    chartsGrid.className = "grid md:grid-cols-2 gap-6";
+    // Stack charts vertically so each chart can be larger (tension above, shear below)
+    chartsGrid.className = "grid grid-cols-1 gap-6";
 
     // Tension Strength Chart
     const tensionChartDiv = document.createElement("div");
@@ -574,6 +685,9 @@ function renderComparison(productsData) {
     tensionChartDiv.appendChild(tensionTitle);
     const tensionCanvas = document.createElement("canvas");
     tensionCanvas.id = "tensionChart";
+    // make the canvas taller so the chart is larger
+    tensionCanvas.style.width = "100%";
+    tensionCanvas.style.height = "380px";
     tensionChartDiv.appendChild(tensionCanvas);
     chartsGrid.appendChild(tensionChartDiv);
 
@@ -587,6 +701,8 @@ function renderComparison(productsData) {
     shearChartDiv.appendChild(shearTitle);
     const shearCanvas = document.createElement("canvas");
     shearCanvas.id = "shearChart";
+    shearCanvas.style.width = "100%";
+    shearCanvas.style.height = "380px";
     shearChartDiv.appendChild(shearCanvas);
     chartsGrid.appendChild(shearChartDiv);
 
@@ -605,47 +721,154 @@ function renderComparisonCharts(productsData) {
   const diameters = new Set();
   const colors = ["#3B82F6", "#8B5CF6", "#EC4899", "#F59E0B", "#10B981"];
 
-  // Collect all unique diameters
+  // Build x positions and groups similar to Python approach
+  const parseSize = (s) => {
+    if (!s) return 0;
+    if (s.includes("/")) {
+      const [num, den] = s.replace('"', "").split("/");
+      return parseFloat(num) / parseFloat(den);
+    }
+    return parseFloat(s) || 0;
+  };
+
+  // Collect all unique diameters present in products (dynamically from compared products)
+  const uniqueDiameters = new Set();
+  productsData.forEach((product) => {
+    product.diameters?.forEach((d) => {
+      const size = d["Anchor Size"]?.value;
+      if (size) uniqueDiameters.add(size);
+    });
+  });
+  // Sort diameters numerically
+  const allDiameters = Array.from(uniqueDiameters).sort(
+    (a, b) => parseSize(a) - parseSize(b)
+  );
+  const dataBySizeThenHef = new Map(); // Map: size -> Map(hef -> [products having this size+hef])
+
   productsData.forEach((product) => {
     product.diameters?.forEach((d) => {
       const anchorSize = d["Anchor Size"];
-      if (anchorSize?.value) {
-        diameters.add(anchorSize.value);
-      }
+      const size = anchorSize?.value;
+      if (!size) return;
+      const hefs = anchorSize?.["Effective Embedment Depth (hef)"] || [];
+      hefs.forEach((h) => {
+        if (!dataBySizeThenHef.has(size))
+          dataBySizeThenHef.set(size, new Map());
+        const hefMap = dataBySizeThenHef.get(size);
+        if (!hefMap.has(h.value)) hefMap.set(h.value, []);
+        hefMap.get(h.value).push({ product, h });
+      });
     });
   });
 
-  const sortedDiameters = Array.from(diameters).sort((a, b) => {
-    // Parse fractional sizes for proper sorting
-    const parseSize = (s) => {
-      if (s.includes("/")) {
-        const [num, den] = s.replace('"', "").split("/");
-        return parseFloat(num) / parseFloat(den);
-      }
-      return parseFloat(s);
-    };
-    return parseSize(a) - parseSize(b);
+  // Build x positions incrementally with gaps between diameter groups
+  const xPositions = [];
+  const xLabels = [];
+  const xTicks = [];
+  const groups = [];
+  const positionToData = []; // maps position index to {size, hef} or null for gap
+  let currentPos = 0;
+  const groupSpacing = 3; // gap between diameter groups (increased for better visual separation)
+
+  allDiameters.forEach((diameter) => {
+    if (!dataBySizeThenHef.has(diameter)) return; // skip if no data for this diameter
+
+    const hefMap = dataBySizeThenHef.get(diameter);
+    const hefs = Array.from(hefMap.keys()).sort(
+      (a, b) => parseFloat(a) - parseFloat(b)
+    );
+    if (hefs.length === 0) return;
+
+    const groupStart = currentPos;
+
+    hefs.forEach((hef) => {
+      xPositions.push(currentPos);
+      xLabels.push(String(hef));
+      xTicks.push(currentPos);
+      positionToData.push({ size: diameter, hef });
+      currentPos++;
+    });
+
+    const groupEnd = currentPos - 1;
+    groups.push({ size: diameter, startIndex: groupStart, endIndex: groupEnd });
+
+    currentPos += groupSpacing; // add gap after group
   });
 
-  // Prepare datasets for tension strength
+  // Plugin to draw group labels and brackets under the x-axis
+  const groupLabelPlugin = {
+    id: "groupLabels",
+    afterDraw: (chart) => {
+      const { ctx, chartArea, scales, options } = chart;
+      const xScale = scales.x;
+      // Read groups and xLabels from chart options if provided, fallback to outer-scope
+      const pluginOpts =
+        (options && options.plugins && options.groupLabels) || {};
+      const localGroups = pluginOpts.groups || groups || [];
+      const localXLabels = pluginOpts.xLabels || xLabels || [];
+
+      if (!localGroups.length) return;
+
+      ctx.save();
+      ctx.fillStyle = "#0f172a";
+      ctx.strokeStyle = "#0f172a";
+      ctx.lineWidth = 1;
+      ctx.font = "bold 14px sans-serif";
+      ctx.textAlign = "center";
+
+      // Draw one bracket + label per group
+      localGroups.forEach((g) => {
+        if (g.startIndex == null || g.endIndex == null) return;
+        const startPixel = xScale.getPixelForValue(g.startIndex);
+        const endPixel = xScale.getPixelForValue(g.endIndex);
+        // Guard against invalid coordinates
+        if (!isFinite(startPixel) || !isFinite(endPixel)) return;
+        const center = (startPixel + endPixel) / 2;
+        const bracketY = chartArea.bottom + 8;
+        const bracketHeight = 6;
+        const labelY = chartArea.bottom + 28;
+        ctx.beginPath();
+        ctx.moveTo(startPixel, bracketY); // left vertical
+        ctx.lineTo(startPixel, bracketY + bracketHeight);
+        ctx.moveTo(startPixel, bracketY + bracketHeight);
+        ctx.lineTo(endPixel, bracketY + bracketHeight); // horizontal
+        ctx.moveTo(endPixel, bracketY); // right vertical
+        ctx.lineTo(endPixel, bracketY + bracketHeight);
+        ctx.stroke();
+        ctx.fillText(`Ø ${g.size}`, center, labelY);
+      });
+
+      // Draw hef tick labels above the bracket
+      ctx.font = "12px sans-serif";
+      ctx.fillStyle = "#0f172a";
+      localXLabels.forEach((lab, i) => {
+        if (lab) {
+          const x = xScale.getPixelForValue(i);
+          if (!isFinite(x)) return;
+          ctx.fillText(lab, x, chartArea.bottom + 2);
+        }
+      });
+      ctx.restore();
+    },
+  };
+
+  // Prepare datasets for tension strength (map values to x positions)
   const tensionDatasets = productsData.map((product, idx) => {
-    const data = sortedDiameters.map((diameter) => {
-      const diameterData = product.diameters?.find(
-        (d) => d["Anchor Size"]?.value === diameter
-      );
-      if (!diameterData) return null;
+    // build a map of "size-hef" -> value
+    const map = new Map();
+    product.diameters?.forEach((d) => {
+      const size = d["Anchor Size"]?.value;
+      const hefs = d["Anchor Size"]?.["Effective Embedment Depth (hef)"] || [];
+      hefs.forEach((h) => {
+        map.set(`${size}-${h.value}`, getPhi(h, "φNsa"));
+      });
+    });
 
-      const hefs =
-        diameterData["Anchor Size"]?.["Effective Embedment Depth (hef)"] || [];
-      if (hefs.length === 0) return null;
-
-      // Get average tension strength for this diameter
-      const tensionValues = hefs
-        .map((h) => h["Tension Steel Strength (fNsa)"])
-        .filter((v) => v != null);
-      return tensionValues.length > 0
-        ? tensionValues.reduce((a, b) => a + b) / tensionValues.length
-        : null;
+    // create data array aligned with xPositions
+    const data = positionToData.map((item) => {
+      if (!item) return null; // gap position
+      const key = `${item.size}-${item.hef}`;
+      return map.has(key) ? map.get(key) : null;
     });
 
     return {
@@ -657,25 +880,21 @@ function renderComparisonCharts(productsData) {
     };
   });
 
-  // Prepare datasets for shear strength
+  // Prepare datasets for shear strength (aligned with xPositions)
   const shearDatasets = productsData.map((product, idx) => {
-    const data = sortedDiameters.map((diameter) => {
-      const diameterData = product.diameters?.find(
-        (d) => d["Anchor Size"]?.value === diameter
-      );
-      if (!diameterData) return null;
+    const map = new Map();
+    product.diameters?.forEach((d) => {
+      const size = d["Anchor Size"]?.value;
+      const hefs = d["Anchor Size"]?.["Effective Embedment Depth (hef)"] || [];
+      hefs.forEach((h) => {
+        map.set(`${size}-${h.value}`, getPhi(h, "φVsa"));
+      });
+    });
 
-      const hefs =
-        diameterData["Anchor Size"]?.["Effective Embedment Depth (hef)"] || [];
-      if (hefs.length === 0) return null;
-
-      // Get average shear strength for this diameter
-      const shearValues = hefs
-        .map((h) => h["Shear Steel Strength (fVsa)"])
-        .filter((v) => v != null);
-      return shearValues.length > 0
-        ? shearValues.reduce((a, b) => a + b) / shearValues.length
-        : null;
+    const data = positionToData.map((item) => {
+      if (!item) return null; // gap position
+      const key = `${item.size}-${item.hef}`;
+      return map.has(key) ? map.get(key) : null;
     });
 
     return {
@@ -693,16 +912,20 @@ function renderComparisonCharts(productsData) {
     new Chart(tensionCtx, {
       type: "bar",
       data: {
-        labels: sortedDiameters,
+        labels: xLabels,
         datasets: tensionDatasets,
       },
+      plugins: [groupLabelPlugin],
       options: {
         responsive: true,
         maintainAspectRatio: true,
+        categoryPercentage: 0.95,
+        barPercentage: 0.85,
         plugins: {
           legend: {
             position: "bottom",
           },
+          groupLabels: { groups, xLabels },
           tooltip: {
             callbacks: {
               label: function (context) {
@@ -727,9 +950,16 @@ function renderComparisonCharts(productsData) {
             },
           },
           x: {
+            type: "category",
             title: {
               display: true,
-              text: "Anchor Diameter",
+              text: "hef (in.)",
+            },
+            ticks: {
+              maxRotation: 0,
+              autoSkip: false,
+              // hide default tick labels; plugin will draw hef labels
+              display: false,
             },
           },
         },
@@ -743,16 +973,20 @@ function renderComparisonCharts(productsData) {
     new Chart(shearCtx, {
       type: "bar",
       data: {
-        labels: sortedDiameters,
+        labels: xLabels,
         datasets: shearDatasets,
       },
+      plugins: [groupLabelPlugin],
       options: {
         responsive: true,
         maintainAspectRatio: true,
+        categoryPercentage: 0.95,
+        barPercentage: 0.85,
         plugins: {
           legend: {
             position: "bottom",
           },
+          groupLabels: { groups, xLabels },
           tooltip: {
             callbacks: {
               label: function (context) {
@@ -777,9 +1011,16 @@ function renderComparisonCharts(productsData) {
             },
           },
           x: {
+            type: "category",
             title: {
               display: true,
-              text: "Anchor Diameter",
+              text: "hef (in.)",
+            },
+            ticks: {
+              maxRotation: 0,
+              autoSkip: false,
+              // hide default tick labels; plugin will draw hef labels
+              display: false,
             },
           },
         },
