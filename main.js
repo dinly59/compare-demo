@@ -25,7 +25,6 @@ function showView(viewName) {
 function handleRoute() {
   const hash = window.location.hash.slice(1) || "home";
   showView(hash);
-
   // Auto-load first product when entering table view
   if (hash === "table" && !cachedData && PRODUCTS.length) {
     loadProduct(PRODUCTS[0]).then((d) => renderTable(d));
@@ -730,20 +729,7 @@ function renderComparisonCharts(productsData) {
   const diameters = new Set();
   const colors = ["#3B82F6", "#8B5CF6", "#EC4899", "#F59E0B", "#10B981"];
 
-  // Build combos array of all diameter+hef combos so groups are exact by diameter
-  const combos = [];
-  productsData.forEach((product) => {
-    product.diameters?.forEach((d) => {
-      const anchorSize = d["Anchor Size"];
-      const size = anchorSize?.value;
-      const hefs = anchorSize?.["Effective Embedment Depth (hef)"] || anchorSize?.effective || [];
-      hefs.forEach((h) => {
-        combos.push({ size, hef: h.value, key: `${size} • ${h.value}` });
-      });
-    });
-  });
-
-  // Sort combos by size then hef
+  // Build x positions and groups similar to Python approach
   const parseSize = (s) => {
     if (!s) return 0;
     if (s.includes("/")) {
@@ -753,108 +739,115 @@ function renderComparisonCharts(productsData) {
     return parseFloat(s) || 0;
   };
 
-  combos.sort((a, b) => {
-    const sizeA = parseSize(a.size);
-    const sizeB = parseSize(b.size);
-    if (sizeA !== sizeB) return sizeA - sizeB;
-    return parseFloat(a.hef) - parseFloat(b.hef);
+  // Collect all unique diameters present in products
+  const allDiameters = ["1/4\"", "3/8\"", "1/2\"", "5/8\"", "3/4\"", "1\""];
+  const dataBySizeThenHef = new Map(); // Map: size -> Map(hef -> [products having this size+hef])
+
+  productsData.forEach((product) => {
+    product.diameters?.forEach((d) => {
+      const anchorSize = d["Anchor Size"];
+      const size = anchorSize?.value;
+      if (!size) return;
+      const hefs = anchorSize?.["Effective Embedment Depth (hef)"] || [];
+      hefs.forEach((h) => {
+        if (!dataBySizeThenHef.has(size)) dataBySizeThenHef.set(size, new Map());
+        const hefMap = dataBySizeThenHef.get(size);
+        if (!hefMap.has(h.value)) hefMap.set(h.value, []);
+        hefMap.get(h.value).push({ product, h });
+      });
+    });
   });
 
-  const sortedCombos = combos.map((c) => c.key);
-
-  // Build exact group index for each diameter
+  // Build x positions incrementally with gaps between diameter groups
+  const xPositions = [];
+  const xLabels = [];
+  const xTicks = [];
   const groups = [];
-  let groupStart = 0;
-  for (let i = 1; i <= combos.length; i++) {
-    if (i === combos.length || combos[i].size !== combos[groupStart].size) {
-      groups.push({ size: combos[groupStart].size, startIndex: groupStart, endIndex: i - 1 });
-      groupStart = i;
-    }
-  }
+  const positionToData = []; // maps position index to {size, hef} or null for gap
+  let currentPos = 0;
+  const groupSpacing = 2; // gap between diameter groups
 
-  // X-axis tick labels: only show hef values
-  const xLabels = combos.map((c) => String(c.hef));
+  allDiameters.forEach((diameter) => {
+    if (!dataBySizeThenHef.has(diameter)) return; // skip if no data for this diameter
+
+    const hefMap = dataBySizeThenHef.get(diameter);
+    const hefs = Array.from(hefMap.keys()).sort((a, b) => parseFloat(a) - parseFloat(b));
+    if (hefs.length === 0) return;
+
+    const groupStart = currentPos;
+
+    hefs.forEach((hef) => {
+      xPositions.push(currentPos);
+      xLabels.push(String(hef));
+      xTicks.push(currentPos);
+      positionToData.push({ size: diameter, hef });
+      currentPos++;
+    });
+
+    const groupEnd = currentPos - 1;
+    groups.push({ size: diameter, startIndex: groupStart, endIndex: groupEnd });
+
+    currentPos += groupSpacing; // add gap after group
+  });
 
   // Plugin to draw group labels and brackets under the x-axis
   const groupLabelPlugin = {
-    id: "groupLabels",
-    afterDraw: (chart) => {
-      const { ctx, chartArea, scales, options } = chart;
-      const xScale = scales[Object.keys(scales).find((k) => k.startsWith("x"))];
-      if (!xScale) return;
-      ctx.save();
-      ctx.fillStyle = "#0f172a"; // slate-900
-      ctx.strokeStyle = "#0f172a";
-      ctx.lineWidth = 1;
-      ctx.textAlign = "center";
-      ctx.font = (options?.plugins?.groupLabels?.font || "600 12px sans-serif");
+  id: "groupLabels",
+  afterDraw: chart => {
+    const { ctx, chartArea, scales } = chart;
+    const xScale = scales.x;
+    ctx.save();
+    ctx.fillStyle = "#0f172a";
+    ctx.font = "bold 14px sans-serif";
+    ctx.textAlign = "center";
+    groups.forEach(g => {
+      // Bám sát cột đầu/cuối của group
+      const startPixel = xScale.getPixelForValue(g.startIndex);
+      const endPixel = xScale.getPixelForValue(g.endIndex);
+      const center = (startPixel + endPixel) / 2;
+      const bracketY = chartArea.bottom + 8;
+      const bracketHeight = 6;
+      const labelY = chartArea.bottom + 28;
+      ctx.beginPath();
+      ctx.moveTo(startPixel, bracketY); // left vertical
+      ctx.lineTo(startPixel, bracketY + bracketHeight);
+      ctx.moveTo(startPixel, bracketY + bracketHeight);
+      ctx.lineTo(endPixel, bracketY + bracketHeight); // horizontal
+      ctx.moveTo(endPixel, bracketY); // right vertical
+      ctx.lineTo(endPixel, bracketY + bracketHeight);
+      ctx.stroke();
+      ctx.fillText(`Ø ${g.size}`, center, labelY);
+    });
+    // Draw hef tick labels above the bracket
+    ctx.font = "12px sans-serif";
+    ctx.fillStyle = "#0f172a";
+    xLabels.forEach((lab, i) => {
+      if (lab) {
+        const x = xScale.getPixelForValue(i);
+        ctx.fillText(lab, x, chartArea.bottom + 2);
+      }
+    });
+    ctx.restore();
+  }
+};
 
-      // small padding in pixels to add between groups so they don't touch
-      const groupGap = options?.plugins?.groupLabels?.groupGapPx || 12;
-
-      groups.forEach((g, gi) => {
-        // calculate padded start/end so brackets have breathing room
-        const startPixel = xScale.getPixelForTick(g.startIndex) - (gi ? groupGap / 2 : 0);
-        const endPixel = xScale.getPixelForTick(g.endIndex) + (gi < groups.length - 1 ? groupGap / 2 : 0);
-        const center = (startPixel + endPixel) / 2;
-        const yTop = chartArea.bottom + 6;
-        const yLabel = chartArea.bottom + 22;
-
-        // draw small vertical ticks and horizontal bracket
-        ctx.beginPath();
-        ctx.moveTo(startPixel, yTop);
-        ctx.lineTo(startPixel, yTop + 6);
-        ctx.moveTo(endPixel, yTop);
-        ctx.lineTo(endPixel, yTop + 6);
-        ctx.moveTo(startPixel, yTop + 6);
-        ctx.lineTo(endPixel, yTop + 6);
-        ctx.stroke();
-
-        // draw the group label (e.g., Ø 3/8")
-        const label = `Ø ${g.size}`;
-        ctx.fillText(label, center, yLabel);
-
-        // draw a vertical separator after group (except last) to visually separate groups
-        if (gi < groups.length - 1) {
-          const sepX = endPixel + groupGap / 2;
-          ctx.beginPath();
-          ctx.moveTo(sepX, chartArea.top);
-          ctx.lineTo(sepX, chartArea.bottom + 30);
-          ctx.strokeStyle = options?.plugins?.groupLabels?.separatorColor || "rgba(15,23,42,0.06)";
-          ctx.lineWidth = options?.plugins?.groupLabels?.separatorWidth || 1;
-          ctx.stroke();
-          // reset strokeStyle for next operations
-          ctx.strokeStyle = "#0f172a";
-          ctx.lineWidth = 1;
-        }
-      });
-      // draw hef tick labels just above the group bracket (below the axis line)
-      ctx.font = (options?.plugins?.groupLabels?.tickFont || "12px sans-serif");
-      const hefLabels = chart.data.labels || [];
-      ctx.fillStyle = "#0f172a";
-      hefLabels.forEach((lab, i) => {
-        const x = xScale.getPixelForTick(i);
-        // place hef label slightly below the axis but above the bracket area
-        const yHef = chartArea.bottom + 2;
-        ctx.fillText(lab, x, yHef);
-      });
-      ctx.restore();
-    },
-  };
-
-  // Prepare datasets for tension strength
+  // Prepare datasets for tension strength (map values to x positions)
   const tensionDatasets = productsData.map((product, idx) => {
-    // build a map of "size • hef" -> value
+    // build a map of "size-hef" -> value
     const map = new Map();
     product.diameters?.forEach((d) => {
       const size = d["Anchor Size"]?.value;
       const hefs = d["Anchor Size"]?.["Effective Embedment Depth (hef)"] || [];
       hefs.forEach((h) => {
-        map.set(`${size} • ${h.value}`, getPhi(h, "φNsa"));
+        map.set(`${size}-${h.value}`, getPhi(h, "φNsa"));
       });
     });
-    const data = sortedCombos.map((combo) => {
-      return map.has(combo) ? map.get(combo) : null;
+
+    // create data array aligned with xPositions
+    const data = positionToData.map((item) => {
+      if (!item) return null; // gap position
+      const key = `${item.size}-${item.hef}`;
+      return map.has(key) ? map.get(key) : null;
     });
 
     return {
@@ -866,17 +859,22 @@ function renderComparisonCharts(productsData) {
     };
   });
 
-  // Prepare datasets for shear strength
+  // Prepare datasets for shear strength (aligned with xPositions)
   const shearDatasets = productsData.map((product, idx) => {
     const map = new Map();
     product.diameters?.forEach((d) => {
       const size = d["Anchor Size"]?.value;
       const hefs = d["Anchor Size"]?.["Effective Embedment Depth (hef)"] || [];
       hefs.forEach((h) => {
-        map.set(`${size} • ${h.value}`, getPhi(h, "φVsa"));
+        map.set(`${size}-${h.value}`, getPhi(h, "φVsa"));
       });
     });
-    const data = sortedCombos.map((combo) => (map.has(combo) ? map.get(combo) : null));
+
+    const data = positionToData.map((item) => {
+      if (!item) return null; // gap position
+      const key = `${item.size}-${item.hef}`;
+      return map.has(key) ? map.get(key) : null;
+    });
 
     return {
       label: product.name || `Product ${idx + 1}`,
@@ -929,6 +927,7 @@ function renderComparisonCharts(productsData) {
             },
           },
           x: {
+            type: 'category',
             title: {
               display: true,
               text: "hef (in.)",
@@ -987,6 +986,7 @@ function renderComparisonCharts(productsData) {
             },
           },
           x: {
+            type: 'category',
             title: {
               display: true,
               text: "hef (in.)",
