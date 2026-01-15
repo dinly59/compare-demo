@@ -282,9 +282,8 @@ function renderTable(data, filter = "") {
         h["Anchor Category"] || h.Anchor || "-",
         formatNumber(
           getField(h, [
-            
             "Tension Steel Strength (φNsa)",
-            
+
             "tensionSteelStrength",
             "φNsa",
             "ϕNsa",
@@ -292,45 +291,40 @@ function renderTable(data, filter = "") {
         ),
         formatNumber(
           getField(h, [
-            
             "Tension Breakout Strength - Uncracked Concrete (φNcb,uncr)",
-            
+
             "φNcb",
             "ϕNcb",
           ])
         ),
         formatNumber(
           getField(h, [
-           
             "Tension Breakout Strength - Cracked Concrete (φNcb,cr)",
-            
+
             "φNcb_cr",
             "φNcb,cr",
           ])
         ),
         formatNumber(
           getField(h, [
-            
             "Pullout Strength - Uncracked Concrete (φNp,uncr)",
-            
+
             "φNp",
             "ϕNp",
           ])
         ),
         formatNumber(
           getField(h, [
-            
             "Pullout Strength - Cracked Concrete (φNp,cr)",
-            
+
             "φNp_cr",
             "φNp,cr",
           ])
         ),
         formatNumber(
           getField(h, [
-            
             "Shear Steel Strength (φVsa)",
-            
+
             "shearSteelStrength",
             "φVsa",
             "ϕVsa",
@@ -338,18 +332,16 @@ function renderTable(data, filter = "") {
         ),
         formatNumber(
           getField(h, [
-            
             "Pryout Strength - Uncracked Concrete (φVcp,uncr)",
-            
+
             "φVcp",
             "φVcp_uncr",
           ])
         ),
         formatNumber(
           getField(h, [
-            
             "Pryout Strength - Cracked Concrete (φVcp,cr)",
-            
+
             "φVcp_cr",
             "φVcp,cr",
           ])
@@ -739,8 +731,18 @@ function renderComparisonCharts(productsData) {
     return parseFloat(s) || 0;
   };
 
-  // Collect all unique diameters present in products
-  const allDiameters = ["1/4\"", "3/8\"", "1/2\"", "5/8\"", "3/4\"", "1\""];
+  // Collect all unique diameters present in products (dynamically from compared products)
+  const uniqueDiameters = new Set();
+  productsData.forEach((product) => {
+    product.diameters?.forEach((d) => {
+      const size = d["Anchor Size"]?.value;
+      if (size) uniqueDiameters.add(size);
+    });
+  });
+  // Sort diameters numerically
+  const allDiameters = Array.from(uniqueDiameters).sort(
+    (a, b) => parseSize(a) - parseSize(b)
+  );
   const dataBySizeThenHef = new Map(); // Map: size -> Map(hef -> [products having this size+hef])
 
   productsData.forEach((product) => {
@@ -750,7 +752,8 @@ function renderComparisonCharts(productsData) {
       if (!size) return;
       const hefs = anchorSize?.["Effective Embedment Depth (hef)"] || [];
       hefs.forEach((h) => {
-        if (!dataBySizeThenHef.has(size)) dataBySizeThenHef.set(size, new Map());
+        if (!dataBySizeThenHef.has(size))
+          dataBySizeThenHef.set(size, new Map());
         const hefMap = dataBySizeThenHef.get(size);
         if (!hefMap.has(h.value)) hefMap.set(h.value, []);
         hefMap.get(h.value).push({ product, h });
@@ -765,13 +768,15 @@ function renderComparisonCharts(productsData) {
   const groups = [];
   const positionToData = []; // maps position index to {size, hef} or null for gap
   let currentPos = 0;
-  const groupSpacing = 2; // gap between diameter groups
+  const groupSpacing = 3; // gap between diameter groups (increased for better visual separation)
 
   allDiameters.forEach((diameter) => {
     if (!dataBySizeThenHef.has(diameter)) return; // skip if no data for this diameter
 
     const hefMap = dataBySizeThenHef.get(diameter);
-    const hefs = Array.from(hefMap.keys()).sort((a, b) => parseFloat(a) - parseFloat(b));
+    const hefs = Array.from(hefMap.keys()).sort(
+      (a, b) => parseFloat(a) - parseFloat(b)
+    );
     if (hefs.length === 0) return;
 
     const groupStart = currentPos;
@@ -792,44 +797,60 @@ function renderComparisonCharts(productsData) {
 
   // Plugin to draw group labels and brackets under the x-axis
   const groupLabelPlugin = {
-  id: "groupLabels",
-  afterDraw: chart => {
-    const { ctx, chartArea, scales } = chart;
-    const xScale = scales.x;
-    ctx.save();
-    ctx.fillStyle = "#0f172a";
-    ctx.font = "bold 14px sans-serif";
-    ctx.textAlign = "center";
-    groups.forEach(g => {
-      // Bám sát cột đầu/cuối của group
-      const startPixel = xScale.getPixelForValue(g.startIndex);
-      const endPixel = xScale.getPixelForValue(g.endIndex);
-      const center = (startPixel + endPixel) / 2;
-      const bracketY = chartArea.bottom + 8;
-      const bracketHeight = 6;
-      const labelY = chartArea.bottom + 28;
-      ctx.beginPath();
-      ctx.moveTo(startPixel, bracketY); // left vertical
-      ctx.lineTo(startPixel, bracketY + bracketHeight);
-      ctx.moveTo(startPixel, bracketY + bracketHeight);
-      ctx.lineTo(endPixel, bracketY + bracketHeight); // horizontal
-      ctx.moveTo(endPixel, bracketY); // right vertical
-      ctx.lineTo(endPixel, bracketY + bracketHeight);
-      ctx.stroke();
-      ctx.fillText(`Ø ${g.size}`, center, labelY);
-    });
-    // Draw hef tick labels above the bracket
-    ctx.font = "12px sans-serif";
-    ctx.fillStyle = "#0f172a";
-    xLabels.forEach((lab, i) => {
-      if (lab) {
-        const x = xScale.getPixelForValue(i);
-        ctx.fillText(lab, x, chartArea.bottom + 2);
-      }
-    });
-    ctx.restore();
-  }
-};
+    id: "groupLabels",
+    afterDraw: (chart) => {
+      const { ctx, chartArea, scales, options } = chart;
+      const xScale = scales.x;
+      // Read groups and xLabels from chart options if provided, fallback to outer-scope
+      const pluginOpts =
+        (options && options.plugins && options.groupLabels) || {};
+      const localGroups = pluginOpts.groups || groups || [];
+      const localXLabels = pluginOpts.xLabels || xLabels || [];
+
+      if (!localGroups.length) return;
+
+      ctx.save();
+      ctx.fillStyle = "#0f172a";
+      ctx.strokeStyle = "#0f172a";
+      ctx.lineWidth = 1;
+      ctx.font = "bold 14px sans-serif";
+      ctx.textAlign = "center";
+
+      // Draw one bracket + label per group
+      localGroups.forEach((g) => {
+        if (g.startIndex == null || g.endIndex == null) return;
+        const startPixel = xScale.getPixelForValue(g.startIndex);
+        const endPixel = xScale.getPixelForValue(g.endIndex);
+        // Guard against invalid coordinates
+        if (!isFinite(startPixel) || !isFinite(endPixel)) return;
+        const center = (startPixel + endPixel) / 2;
+        const bracketY = chartArea.bottom + 8;
+        const bracketHeight = 6;
+        const labelY = chartArea.bottom + 28;
+        ctx.beginPath();
+        ctx.moveTo(startPixel, bracketY); // left vertical
+        ctx.lineTo(startPixel, bracketY + bracketHeight);
+        ctx.moveTo(startPixel, bracketY + bracketHeight);
+        ctx.lineTo(endPixel, bracketY + bracketHeight); // horizontal
+        ctx.moveTo(endPixel, bracketY); // right vertical
+        ctx.lineTo(endPixel, bracketY + bracketHeight);
+        ctx.stroke();
+        ctx.fillText(`Ø ${g.size}`, center, labelY);
+      });
+
+      // Draw hef tick labels above the bracket
+      ctx.font = "12px sans-serif";
+      ctx.fillStyle = "#0f172a";
+      localXLabels.forEach((lab, i) => {
+        if (lab) {
+          const x = xScale.getPixelForValue(i);
+          if (!isFinite(x)) return;
+          ctx.fillText(lab, x, chartArea.bottom + 2);
+        }
+      });
+      ctx.restore();
+    },
+  };
 
   // Prepare datasets for tension strength (map values to x positions)
   const tensionDatasets = productsData.map((product, idx) => {
@@ -898,11 +919,13 @@ function renderComparisonCharts(productsData) {
       options: {
         responsive: true,
         maintainAspectRatio: true,
+        categoryPercentage: 0.95,
+        barPercentage: 0.85,
         plugins: {
           legend: {
             position: "bottom",
           },
-          groupLabels: { groups },
+          groupLabels: { groups, xLabels },
           tooltip: {
             callbacks: {
               label: function (context) {
@@ -927,7 +950,7 @@ function renderComparisonCharts(productsData) {
             },
           },
           x: {
-            type: 'category',
+            type: "category",
             title: {
               display: true,
               text: "hef (in.)",
@@ -957,11 +980,13 @@ function renderComparisonCharts(productsData) {
       options: {
         responsive: true,
         maintainAspectRatio: true,
+        categoryPercentage: 0.95,
+        barPercentage: 0.85,
         plugins: {
           legend: {
             position: "bottom",
           },
-          groupLabels: { groups },
+          groupLabels: { groups, xLabels },
           tooltip: {
             callbacks: {
               label: function (context) {
@@ -986,7 +1011,7 @@ function renderComparisonCharts(productsData) {
             },
           },
           x: {
-            type: 'category',
+            type: "category",
             title: {
               display: true,
               text: "hef (in.)",
