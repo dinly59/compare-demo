@@ -547,7 +547,13 @@ compareBtn?.addEventListener("click", async () => {
     );
     const productsData = await Promise.all(dataPromises);
 
-    renderComparison(productsData);
+    // Backwards-compatible wrapper: older code calls renderComparison
+    if (typeof renderComparison === 'function') {
+      renderComparison(productsData);
+    } else {
+      // fall back to new function
+      renderComparisonCharts(productsData);
+    }
   } catch (e) {
     compareContainer.innerHTML = `
       <div class="text-center py-16 text-red-600">
@@ -560,10 +566,11 @@ compareBtn?.addEventListener("click", async () => {
   }
 });
 
+// Backwards-compatible renderComparison entrypoint (keeps prior callers working)
 function renderComparison(productsData) {
+  // Build the common overview table and then render charts
   compareContainer.innerHTML = "";
 
-  // Overview Table Section
   const overviewSection = document.createElement("div");
   overviewSection.className =
     "bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden";
@@ -580,7 +587,7 @@ function renderComparison(productsData) {
   const table = document.createElement("table");
   table.className = "w-full border-collapse";
 
-  // Header
+  // simple header with product names
   const thead = document.createElement("thead");
   const headerRow = document.createElement("tr");
   const th1 = document.createElement("th");
@@ -599,10 +606,8 @@ function renderComparison(productsData) {
   thead.appendChild(headerRow);
   table.appendChild(thead);
 
-  // Body
   const tbody = document.createElement("tbody");
-
-  // Company row
+  // company row
   const companyRow = document.createElement("tr");
   const companyLabel = document.createElement("td");
   companyLabel.className =
@@ -617,121 +622,69 @@ function renderComparison(productsData) {
   });
   tbody.appendChild(companyRow);
 
-  // Diameter count row
-  const diameterRow = document.createElement("tr");
-  const diameterLabel = document.createElement("td");
-  diameterLabel.className =
-    "px-4 py-3 text-sm font-semibold text-slate-700 bg-slate-50 border-b border-slate-200 sticky left-0";
-  diameterLabel.textContent = "Available Sizes";
-  diameterRow.appendChild(diameterLabel);
-  productsData.forEach((data) => {
-    const td = document.createElement("td");
-    td.className = "px-4 py-3 text-sm text-slate-700 border-b border-slate-200";
-    td.textContent = (data.diameters?.length || 0) + " sizes";
-    diameterRow.appendChild(td);
-  });
-  tbody.appendChild(diameterRow);
-
-  // Total configurations row
-  const configRow = document.createElement("tr");
-  const configLabel = document.createElement("td");
-  configLabel.className =
-    "px-4 py-3 text-sm font-semibold text-slate-700 bg-slate-50 border-b border-slate-200 sticky left-0";
-  configLabel.textContent = "Total Configurations";
-  configRow.appendChild(configLabel);
-  productsData.forEach((data) => {
-    const td = document.createElement("td");
-    td.className = "px-4 py-3 text-sm text-slate-700 border-b border-slate-200";
-    const total =
-      data.diameters?.reduce(
-        (sum, d) =>
-          sum +
-          (d["Anchor Size"]?.["Effective Embedment Depth (hef)"]?.length || 0),
-        0
-      ) || 0;
-    td.textContent = total + " configurations";
-    configRow.appendChild(td);
-  });
-  tbody.appendChild(configRow);
-
   table.appendChild(tbody);
   wrapper.appendChild(table);
   overviewSection.appendChild(wrapper);
   compareContainer.appendChild(overviewSection);
 
-  // Charts Section - Diameter Comparison
-  if (productsData.length === 2) {
-    const chartsSection = document.createElement("div");
-    chartsSection.className =
-      "bg-white rounded-xl shadow-md border border-slate-200 p-6";
+  // prepare chart canvases (Tension above Shear)
+  const chartsSection = document.createElement('section');
+  chartsSection.className = 'grid gap-6';
+  chartsSection.innerHTML = `
+    <div class="bg-white rounded-xl shadow-md p-4 border border-slate-200">
+      <h3 class="text-lg font-semibold mb-2">Tension</h3>
+      <div style="height:420px">
+        <canvas id="tensionChart"></canvas>
+      </div>
+    </div>
+    <div class="bg-white rounded-xl shadow-md p-4 border border-slate-200">
+      <h3 class="text-lg font-semibold mb-2">Shear</h3>
+      <div style="height:320px">
+        <canvas id="shearChart"></canvas>
+      </div>
+    </div>
+  `;
+  compareContainer.appendChild(chartsSection);
 
-    const chartTitle = document.createElement("h2");
-    chartTitle.className = "text-2xl font-bold text-slate-800 mb-4";
-    chartTitle.textContent = "Diameter Specifications Comparison";
-    chartsSection.appendChild(chartTitle);
-
-    // Create chart containers
-    const chartsGrid = document.createElement("div");
-    // Stack charts vertically so each chart can be larger (tension above, shear below)
-    chartsGrid.className = "grid grid-cols-1 gap-6";
-
-    // Tension Strength Chart
-    const tensionChartDiv = document.createElement("div");
-    tensionChartDiv.className = "bg-slate-50 p-4 rounded-lg";
-    const tensionTitle = document.createElement("h3");
-    tensionTitle.className =
-      "text-lg font-semibold text-slate-700 mb-3 text-center";
-    tensionTitle.textContent = "Tension Steel Strength (fNsa) by Diameter";
-    tensionChartDiv.appendChild(tensionTitle);
-    const tensionCanvas = document.createElement("canvas");
-    tensionCanvas.id = "tensionChart";
-    // make the canvas taller so the chart is larger
-    tensionCanvas.style.width = "100%";
-    tensionCanvas.style.height = "380px";
-    tensionChartDiv.appendChild(tensionCanvas);
-    chartsGrid.appendChild(tensionChartDiv);
-
-    // Shear Strength Chart
-    const shearChartDiv = document.createElement("div");
-    shearChartDiv.className = "bg-slate-50 p-4 rounded-lg";
-    const shearTitle = document.createElement("h3");
-    shearTitle.className =
-      "text-lg font-semibold text-slate-700 mb-3 text-center";
-    shearTitle.textContent = "Shear Steel Strength (fVsa) by Diameter";
-    shearChartDiv.appendChild(shearTitle);
-    const shearCanvas = document.createElement("canvas");
-    shearCanvas.id = "shearChart";
-    shearCanvas.style.width = "100%";
-    shearCanvas.style.height = "380px";
-    shearChartDiv.appendChild(shearCanvas);
-    chartsGrid.appendChild(shearChartDiv);
-
-    chartsSection.appendChild(chartsGrid);
-    compareContainer.appendChild(chartsSection);
-
-    // Render charts after DOM is updated
-    setTimeout(() => {
-      renderComparisonCharts(productsData);
-    }, 100);
-  }
+  // then render charts
+  renderComparisonCharts(productsData);
 }
 
 function renderComparisonCharts(productsData) {
-  // Prepare data for charts
-  const diameters = new Set();
-  const colors = ["#3B82F6", "#8B5CF6", "#EC4899", "#F59E0B", "#10B981"];
+  const colors = ["#FFBE98", "#C5D3E8", "#98D8C8", "#F7DC6F", "#BB8FCE"];
 
-  // Build x positions and groups similar to Python approach
+  // Helper to parse anchor size strings
   const parseSize = (s) => {
     if (!s) return 0;
-    if (s.includes("/")) {
-      const [num, den] = s.replace('"', "").split("/");
+    const cleaned = s.replace(/["\s]/g, '');
+    if (cleaned.includes("/")) {
+      const [num, den] = cleaned.split("/");
       return parseFloat(num) / parseFloat(den);
     }
-    return parseFloat(s) || 0;
+    return parseFloat(cleaned) || 0;
   };
 
-  // Collect all unique diameters present in products (dynamically from compared products)
+  // Helper to convert decimal to fraction display
+  const toFraction = (val) => {
+    if (!val) return val;
+    const num = parseFloat(val);
+    if (num % 1 === 0) return num.toString();
+    
+    const fracs = {
+      0.125: "1/8", 0.25: "1/4", 0.375: "3/8", 0.5: "1/2",
+      0.625: "5/8", 0.75: "3/4", 0.875: "7/8"
+    };
+    
+    const whole = Math.floor(num);
+    const decimal = num - whole;
+    const fracStr = fracs[Math.round(decimal * 8) / 8];
+    
+    if (whole > 0 && fracStr) return `${whole}-${fracStr}`;
+    if (fracStr) return fracStr;
+    return val;
+  };
+
+  // Step 1: Collect all unique diameters
   const uniqueDiameters = new Set();
   productsData.forEach((product) => {
     product.diameters?.forEach((d) => {
@@ -739,296 +692,322 @@ function renderComparisonCharts(productsData) {
       if (size) uniqueDiameters.add(size);
     });
   });
-  // Sort diameters numerically
-  const allDiameters = Array.from(uniqueDiameters).sort(
+
+  const sortedDiameters = Array.from(uniqueDiameters).sort(
     (a, b) => parseSize(a) - parseSize(b)
   );
-  const dataBySizeThenHef = new Map(); // Map: size -> Map(hef -> [products having this size+hef])
 
-  productsData.forEach((product) => {
-    product.diameters?.forEach((d) => {
-      const anchorSize = d["Anchor Size"];
-      const size = anchorSize?.value;
-      if (!size) return;
-      const hefs = anchorSize?.["Effective Embedment Depth (hef)"] || [];
-      hefs.forEach((h) => {
-        if (!dataBySizeThenHef.has(size))
-          dataBySizeThenHef.set(size, new Map());
-        const hefMap = dataBySizeThenHef.get(size);
-        if (!hefMap.has(h.value)) hefMap.set(h.value, []);
-        hefMap.get(h.value).push({ product, h });
-      });
+  // Step 2: Build flat array of all bars with their data
+  const allBars = [];
+  
+  sortedDiameters.forEach((diameter) => {
+    // Collect all (hef, product) combinations for this diameter
+    const diameterBars = [];
+    
+    productsData.forEach((product, productIdx) => {
+      const diameterData = product.diameters?.find(
+        d => d["Anchor Size"]?.value === diameter
+      );
+      
+      if (diameterData) {
+        const hefs = diameterData["Anchor Size"]?.["Effective Embedment Depth (hef)"] || [];
+        hefs.forEach((h) => {
+          diameterBars.push({
+            diameter,
+            hef: h.value,
+            productIdx,
+            productName: product.name || `Product ${productIdx + 1}`,
+            tensionValue: getPhi(h, "φNsa"),
+            shearValue: getPhi(h, "φVsa")
+          });
+        });
+      }
     });
+    
+    // Sort bars by hef first, then by productIdx (so same hef values are adjacent)
+    diameterBars.sort((a, b) => {
+      const hefDiff = parseFloat(a.hef) - parseFloat(b.hef);
+      if (hefDiff !== 0) return hefDiff;
+      return a.productIdx - b.productIdx;
+    });
+    
+    allBars.push(...diameterBars);
   });
 
-  // Build x positions incrementally with gaps between diameter groups
-  const xPositions = [];
-  const xLabels = [];
-  const xTicks = [];
-  const groups = [];
-  const positionToData = []; // maps position index to {size, hef} or null for gap
-  let currentPos = 0;
-  const groupSpacing = 3; // gap between diameter groups (increased for better visual separation)
-
-  allDiameters.forEach((diameter) => {
-    if (!dataBySizeThenHef.has(diameter)) return; // skip if no data for this diameter
-
-    const hefMap = dataBySizeThenHef.get(diameter);
-    const hefs = Array.from(hefMap.keys()).sort(
-      (a, b) => parseFloat(a) - parseFloat(b)
+  // Step 3: Build labels and positions
+  const labels = allBars.map((bar, idx) => `${bar.diameter}_${bar.hef}_${bar.productIdx}`);
+  const xLabels = allBars.map(bar => toFraction(bar.hef));
+  
+  // Step 4: Create ONE dataset per product with sparse data
+  const tensionDatasets = productsData.map((product, productIdx) => {
+    const data = allBars.map(bar => 
+      bar.productIdx === productIdx ? bar.tensionValue : null
     );
-    if (hefs.length === 0) return;
-
-    const groupStart = currentPos;
-
-    hefs.forEach((hef) => {
-      xPositions.push(currentPos);
-      xLabels.push(String(hef));
-      xTicks.push(currentPos);
-      positionToData.push({ size: diameter, hef });
-      currentPos++;
-    });
-
-    const groupEnd = currentPos - 1;
-    groups.push({ size: diameter, startIndex: groupStart, endIndex: groupEnd });
-
-    currentPos += groupSpacing; // add gap after group
+    
+    return {
+      label: product.name || `Product ${productIdx + 1}`,
+      data: data,
+      backgroundColor: colors[productIdx % colors.length],
+      borderColor: colors[productIdx % colors.length],
+      borderWidth: 1,
+      barThickness: 'flex',
+      maxBarThickness: 40,
+    };
   });
 
-  // Plugin to draw group labels and brackets under the x-axis
-  const groupLabelPlugin = {
-    id: "groupLabels",
+  const shearDatasets = productsData.map((product, productIdx) => {
+    const data = allBars.map(bar => 
+      bar.productIdx === productIdx ? bar.shearValue : null
+    );
+    
+    return {
+      label: product.name || `Product ${productIdx + 1}`,
+      data: data,
+      backgroundColor: colors[productIdx % colors.length],
+      borderColor: colors[productIdx % colors.length],
+      borderWidth: 1,
+      barThickness: 'flex',
+      maxBarThickness: 40,
+    };
+  });
+
+  // Step 5: Calculate diameter group boundaries
+  const groupBoundaries = [];
+  let currentDiameter = null;
+  let groupStart = 0;
+  
+  allBars.forEach((bar, idx) => {
+    if (bar.diameter !== currentDiameter) {
+      if (currentDiameter !== null) {
+        groupBoundaries.push({
+          diameter: currentDiameter,
+          start: groupStart,
+          end: idx - 1
+        });
+      }
+      currentDiameter = bar.diameter;
+      groupStart = idx;
+    }
+  });
+  
+  // Don't forget last group
+  if (currentDiameter !== null) {
+    groupBoundaries.push({
+      diameter: currentDiameter,
+      start: groupStart,
+      end: allBars.length - 1
+    });
+  }
+
+  // Step 6: Custom plugin for diameter labels and separators
+  const diameterLabelPlugin = {
+    id: "diameterGroupLabels",
     afterDraw: (chart) => {
-      const { ctx, chartArea, scales, options } = chart;
+      const { ctx, chartArea, scales } = chart;
       const xScale = scales.x;
-      // Read groups and xLabels from chart options if provided, fallback to outer-scope
-      const pluginOpts =
-        (options && options.plugins && options.groupLabels) || {};
-      const localGroups = pluginOpts.groups || groups || [];
-      const localXLabels = pluginOpts.xLabels || xLabels || [];
-
-      if (!localGroups.length) return;
-
+      
+      if (!xScale || !chartArea) return;
+      
       ctx.save();
-      ctx.fillStyle = "#0f172a";
-      ctx.strokeStyle = "#0f172a";
-      ctx.lineWidth = 1;
-      ctx.font = "bold 14px sans-serif";
-      ctx.textAlign = "center";
-
-      // Draw one bracket + label per group
-      localGroups.forEach((g) => {
-        if (g.startIndex == null || g.endIndex == null) return;
-        const startPixel = xScale.getPixelForValue(g.startIndex);
-        const endPixel = xScale.getPixelForValue(g.endIndex);
-        // Guard against invalid coordinates
-        if (!isFinite(startPixel) || !isFinite(endPixel)) return;
-        const center = (startPixel + endPixel) / 2;
-        const bracketY = chartArea.bottom + 8;
-        const bracketHeight = 6;
-        const labelY = chartArea.bottom + 28;
-        ctx.beginPath();
-        ctx.moveTo(startPixel, bracketY); // left vertical
-        ctx.lineTo(startPixel, bracketY + bracketHeight);
-        ctx.moveTo(startPixel, bracketY + bracketHeight);
-        ctx.lineTo(endPixel, bracketY + bracketHeight); // horizontal
-        ctx.moveTo(endPixel, bracketY); // right vertical
-        ctx.lineTo(endPixel, bracketY + bracketHeight);
-        ctx.stroke();
-        ctx.fillText(`Ø ${g.size}`, center, labelY);
-      });
-
-      // Draw hef tick labels above the bracket
-      ctx.font = "12px sans-serif";
-      ctx.fillStyle = "#0f172a";
-      localXLabels.forEach((lab, i) => {
-        if (lab) {
-          const x = xScale.getPixelForValue(i);
-          if (!isFinite(x)) return;
-          ctx.fillText(lab, x, chartArea.bottom + 2);
+      
+      groupBoundaries.forEach((group, groupIdx) => {
+        const startPixel = xScale.getPixelForValue(group.start);
+        const endPixel = xScale.getPixelForValue(group.end);
+        const centerPixel = (startPixel + endPixel) / 2;
+        
+        // Draw diameter label
+        ctx.fillStyle = "#1e293b";
+        ctx.font = "bold 14px sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
+        ctx.fillText(`Ø ${group.diameter}`, centerPixel, chartArea.bottom + 40);
+        
+        // Draw separator line between groups (except after last)
+        if (groupIdx < groupBoundaries.length - 1) {
+          const nextGroup = groupBoundaries[groupIdx + 1];
+          const separatorX = (endPixel + xScale.getPixelForValue(nextGroup.start)) / 2;
+          
+          ctx.strokeStyle = "#cbd5e1";
+          ctx.lineWidth = 2;
+          ctx.setLineDash([5, 5]);
+          ctx.beginPath();
+          ctx.moveTo(separatorX, chartArea.top);
+          ctx.lineTo(separatorX, chartArea.bottom);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
+        
+        // Draw hef labels for each bar in this group
+        ctx.font = "11px sans-serif";
+        ctx.fillStyle = "#475569";
+        
+        const drawnHefs = new Set();
+        for (let i = group.start; i <= group.end; i++) {
+          const bar = allBars[i];
+          const hefLabel = toFraction(bar.hef);
+          
+          // Only draw hef label once per unique hef value
+          if (!drawnHefs.has(bar.hef)) {
+            // Find all bars with this hef in this group
+            const samHefBars = [];
+            for (let j = group.start; j <= group.end; j++) {
+              if (allBars[j].hef === bar.hef) {
+                samHefBars.push(j);
+              }
+            }
+            
+            // Calculate center position of this hef group
+            const firstIdx = samHefBars[0];
+            const lastIdx = samHefBars[samHefBars.length - 1];
+            const hefStartPixel = xScale.getPixelForValue(firstIdx);
+            const hefEndPixel = xScale.getPixelForValue(lastIdx);
+            const hefCenterPixel = (hefStartPixel + hefEndPixel) / 2;
+            
+            ctx.fillText(hefLabel, hefCenterPixel, chartArea.bottom + 20);
+            drawnHefs.add(bar.hef);
+          }
         }
       });
+      
       ctx.restore();
     },
   };
 
-  // Prepare datasets for tension strength (map values to x positions)
-  const tensionDatasets = productsData.map((product, idx) => {
-    // build a map of "size-hef" -> value
-    const map = new Map();
-    product.diameters?.forEach((d) => {
-      const size = d["Anchor Size"]?.value;
-      const hefs = d["Anchor Size"]?.["Effective Embedment Depth (hef)"] || [];
-      hefs.forEach((h) => {
-        map.set(`${size}-${h.value}`, getPhi(h, "φNsa"));
-      });
-    });
+  // Chart configuration
+  const chartConfig = {
+    responsive: true,
+    maintainAspectRatio: false,
+    skipNull: false,
+    interaction: {
+      mode: 'point',
+      intersect: true,
+    },
+    layout: {
+      padding: {
+        bottom: 70
+      }
+    },
+    plugins: {
+      legend: {
+        position: "top",
+        labels: {
+          boxWidth: 20,
+          padding: 15,
+          font: { size: 12 }
+        }
+      },
+      tooltip: {
+        callbacks: {
+          title: function(context) {
+            const idx = context[0].dataIndex;
+            const bar = allBars[idx];
+            return `Ø ${bar.diameter} @ hef ${toFraction(bar.hef)}"`;
+          },
+          label: function(context) {
+            let label = context.dataset.label || "";
+            if (label) label += ": ";
+            if (context.parsed.y !== null) {
+              label += context.parsed.y.toLocaleString() + " lbs";
+            }
+            return label;
+          },
+        },
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          font: { size: 13, weight: 'bold' }
+        },
+        ticks: {
+          callback: function(value) {
+            return value.toLocaleString();
+          }
+        },
+        grid: {
+          color: '#e5e7eb'
+        }
+      },
+      x: {
+        type: 'category',
+        offset: true,
+        title: {
+          display: true,
+          text: "hef (in.)",
+          font: { size: 13, weight: 'bold' },
+          padding: { top: 50 }
+        },
+        ticks: {
+          display: false, // Hide default ticks, we draw custom ones
+        },
+        grid: {
+          display: false,
+          offset: false,
+        }
+      },
+    },
+  };
 
-    // create data array aligned with xPositions
-    const data = positionToData.map((item) => {
-      if (!item) return null; // gap position
-      const key = `${item.size}-${item.hef}`;
-      return map.has(key) ? map.get(key) : null;
-    });
-
-    return {
-      label: product.name || `Product ${idx + 1}`,
-      data: data,
-      borderColor: colors[idx % colors.length],
-      backgroundColor: colors[idx % colors.length],
-      borderWidth: 2,
-    };
-  });
-
-  // Prepare datasets for shear strength (aligned with xPositions)
-  const shearDatasets = productsData.map((product, idx) => {
-    const map = new Map();
-    product.diameters?.forEach((d) => {
-      const size = d["Anchor Size"]?.value;
-      const hefs = d["Anchor Size"]?.["Effective Embedment Depth (hef)"] || [];
-      hefs.forEach((h) => {
-        map.set(`${size}-${h.value}`, getPhi(h, "φVsa"));
-      });
-    });
-
-    const data = positionToData.map((item) => {
-      if (!item) return null; // gap position
-      const key = `${item.size}-${item.hef}`;
-      return map.has(key) ? map.get(key) : null;
-    });
-
-    return {
-      label: product.name || `Product ${idx + 1}`,
-      data: data,
-      borderColor: colors[idx % colors.length],
-      backgroundColor: colors[idx % colors.length],
-      borderWidth: 2,
-    };
-  });
-
-  // Render Tension Strength Chart
+  // Render Tension Chart
   const tensionCtx = document.getElementById("tensionChart");
   if (tensionCtx && window.Chart) {
+    const existingChart = Chart.getChart(tensionCtx);
+    if (existingChart) existingChart.destroy();
+    
     new Chart(tensionCtx, {
       type: "bar",
       data: {
-        labels: xLabels,
+        labels: labels,
         datasets: tensionDatasets,
       },
-      plugins: [groupLabelPlugin],
+      plugins: [diameterLabelPlugin],
       options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        categoryPercentage: 0.95,
-        barPercentage: 0.85,
-        plugins: {
-          legend: {
-            position: "bottom",
-          },
-          groupLabels: { groups, xLabels },
-          tooltip: {
-            callbacks: {
-              label: function (context) {
-                let label = context.dataset.label || "";
-                if (label) {
-                  label += ": ";
-                }
-                if (context.parsed.y !== null) {
-                  label += context.parsed.y.toLocaleString() + " lbs";
-                }
-                return label;
-              },
-            },
-          },
-        },
+        ...chartConfig,
         scales: {
+          ...chartConfig.scales,
           y: {
-            beginAtZero: true,
+            ...chartConfig.scales.y,
             title: {
-              display: true,
-              text: "Tension Strength (lbs)",
-            },
-          },
-          x: {
-            type: "category",
-            title: {
-              display: true,
-              text: "hef (in.)",
-            },
-            ticks: {
-              maxRotation: 0,
-              autoSkip: false,
-              // hide default tick labels; plugin will draw hef labels
-              display: false,
-            },
-          },
-        },
+              ...chartConfig.scales.y.title,
+              text: "Tension Steel Strength (φNsa) - lbs"
+            }
+          }
+        }
       },
     });
   }
 
-  // Render Shear Strength Chart
+  // Render Shear Chart
   const shearCtx = document.getElementById("shearChart");
   if (shearCtx && window.Chart) {
+    const existingChart = Chart.getChart(shearCtx);
+    if (existingChart) existingChart.destroy();
+    
     new Chart(shearCtx, {
       type: "bar",
       data: {
-        labels: xLabels,
+        labels: labels,
         datasets: shearDatasets,
       },
-      plugins: [groupLabelPlugin],
+      plugins: [diameterLabelPlugin],
       options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        categoryPercentage: 0.95,
-        barPercentage: 0.85,
-        plugins: {
-          legend: {
-            position: "bottom",
-          },
-          groupLabels: { groups, xLabels },
-          tooltip: {
-            callbacks: {
-              label: function (context) {
-                let label = context.dataset.label || "";
-                if (label) {
-                  label += ": ";
-                }
-                if (context.parsed.y !== null) {
-                  label += context.parsed.y.toLocaleString() + " lbs";
-                }
-                return label;
-              },
-            },
-          },
-        },
+        ...chartConfig,
         scales: {
+          ...chartConfig.scales,
           y: {
-            beginAtZero: true,
+            ...chartConfig.scales.y,
             title: {
-              display: true,
-              text: "Shear Strength (lbs)",
-            },
-          },
-          x: {
-            type: "category",
-            title: {
-              display: true,
-              text: "hef (in.)",
-            },
-            ticks: {
-              maxRotation: 0,
-              autoSkip: false,
-              // hide default tick labels; plugin will draw hef labels
-              display: false,
-            },
-          },
-        },
+              ...chartConfig.scales.y.title,
+              text: "Shear Steel Strength (φVsa) - lbs"
+            }
+          }
+        }
       },
     });
   }
 }
-
 // Initialize
 populateSelect();
 populateCompareSelects();
