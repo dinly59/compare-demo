@@ -483,6 +483,13 @@
       </footer>
     </div>
 
-    <script type="module" src="main.js"></script>
+    <!-- MVC Architecture: Load in order - Model, Views, Controllers, App -->
+    <script src="js/models/ProductModel.js"></script>
+    <script src="js/views/NavigationView.js"></script>
+    <script src="js/views/TableView.js"></script>
+    <script src="js/views/CompareView.js"></script>
+    <script src="js/controllers/TableController.js"></script>
+    <script src="js/controllers/CompareController.js"></script>
+    <script src="js/controllers/AppController.js"></script>
   </body>
 </html>
