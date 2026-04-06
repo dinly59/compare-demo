@@ -4,7 +4,6 @@
  * Schema Classes (imported):
  * - EffectiveEmbedmentDepth
  * - AnchorSize
- * - Diameter
  * - Product
  */
 class ProductModel {
@@ -97,10 +96,12 @@ class ProductModel {
     if (!filterTerm || !data) return data;
 
     const normalizedFilter = this.normalizeKey(filterTerm);
-    const filteredDiameters = [];
+    const filteredAnchorSizes = [];
 
-    (data.diameters || []).forEach((d) => {
-      const anchorSize = d["Anchor Size"] || d.anchorSize || {};
+    const anchorSizes = data.anchorSizes || [];
+
+    anchorSizes.forEach((a) => {
+      const anchorSize = a["Anchor Size"] || a.anchorSize || a || {};
       const hefs =
         anchorSize["Effective Embedment Depth (hef)"] ||
         anchorSize.effectiveEmbedmentDepth ||
@@ -113,18 +114,20 @@ class ProductModel {
       });
 
       if (filteredHefs.length > 0) {
-        const filteredDiameter = { ...d };
-        if (filteredDiameter["Anchor Size"]) {
-          filteredDiameter["Anchor Size"]["Effective Embedment Depth (hef)"] =
+        const filteredAnchorSize = { ...anchorSize };
+        if (filteredAnchorSize["Anchor Size"]) {
+          filteredAnchorSize["Anchor Size"]["Effective Embedment Depth (hef)"] =
             filteredHefs;
+        } else {
+          filteredAnchorSize["Effective Embedment Depth (hef)"] = filteredHefs;
         }
-        filteredDiameters.push(filteredDiameter);
+        filteredAnchorSizes.push(filteredAnchorSize);
       }
     });
 
     return {
       ...data,
-      diameters: filteredDiameters,
+      anchorSizes: filteredAnchorSizes,
     };
   }
 
@@ -211,12 +214,12 @@ class ProductModel {
    * Get total row count for a product
    */
   getTotalRowCount(data) {
-    if (!data || !data.diameters) return 0;
-    return data.diameters.reduce(
-      (sum, d) =>
-        sum +
-        (d["Anchor Size"]?.["Effective Embedment Depth (hef)"]?.length || 0),
-      0,
-    );
+    const anchorSizes = data?.anchorSizes || [];
+    if (!anchorSizes.length) return 0;
+
+    return anchorSizes.reduce((sum, a) => {
+      const anchorSize = a["Anchor Size"] || a.anchorSize || a || {};
+      return sum + (anchorSize["Effective Embedment Depth (hef)"]?.length || 0);
+    }, 0);
   }
 }

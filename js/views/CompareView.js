@@ -95,15 +95,28 @@ class CompareView {
     const tbody = document.createElement("tbody");
 
     // Company row
-    this.addOverviewRow(tbody, "Company", productsData, (data) => data.company || "-");
+    this.addOverviewRow(
+      tbody,
+      "Company",
+      productsData,
+      (data) => data.company || "-",
+    );
 
-    // Diameter count row
-    this.addOverviewRow(tbody, "Available Sizes", productsData,
-      (data) => (data.diameters?.length || 0) + " sizes");
+    // Anchor size count row
+    this.addOverviewRow(
+      tbody,
+      "Available Sizes",
+      productsData,
+      (data) => (data.anchorSizes?.length || 0) + " sizes",
+    );
 
     // Total configurations row
-    this.addOverviewRow(tbody, "Total Configurations", productsData,
-      (data) => this.model.getTotalRowCount(data) + " configurations");
+    this.addOverviewRow(
+      tbody,
+      "Total Configurations",
+      productsData,
+      (data) => this.model.getTotalRowCount(data) + " configurations",
+    );
 
     table.appendChild(tbody);
     wrapper.appendChild(table);
@@ -124,7 +137,8 @@ class CompareView {
 
     productsData.forEach((data) => {
       const td = document.createElement("td");
-      td.className = "px-4 py-3 text-sm text-slate-700 border-b border-slate-200";
+      td.className =
+        "px-4 py-3 text-sm text-slate-700 border-b border-slate-200";
       td.textContent = valueFn(data);
       row.appendChild(td);
     });
@@ -142,7 +156,7 @@ class CompareView {
 
     const chartTitle = document.createElement("h2");
     chartTitle.className = "text-2xl font-bold text-slate-800 mb-4";
-    chartTitle.textContent = "Diameter Specifications Comparison";
+    chartTitle.textContent = "Anchor Size Specifications Comparison";
     chartsSection.appendChild(chartTitle);
 
     const chartsGrid = document.createElement("div");
@@ -151,14 +165,14 @@ class CompareView {
     // Tension chart
     const tensionChartDiv = this.createChartContainer(
       "tensionChart",
-      "Tension Steel Strength (fNsa) by Diameter"
+      "Tension Steel Strength (fNsa) by Anchor Size",
     );
     chartsGrid.appendChild(tensionChartDiv);
 
     // Shear chart
     const shearChartDiv = this.createChartContainer(
       "shearChart",
-      "Shear Steel Strength (fVsa) by Diameter"
+      "Shear Steel Strength (fVsa) by Anchor Size",
     );
     chartsGrid.appendChild(shearChartDiv);
 
@@ -196,22 +210,43 @@ class CompareView {
    * Render comparison charts
    */
   renderCharts(productsData) {
-    const { xPositions, xLabels, groups, positionToData } = this.prepareChartData(productsData);
+    const { xPositions, xLabels, groups, positionToData } =
+      this.prepareChartData(productsData);
 
     // Create plugin for group labels
     const groupLabelPlugin = this.createGroupLabelPlugin(groups, xLabels);
 
     // Prepare datasets
-    const tensionDatasets = this.createTensionDatasets(productsData, positionToData);
-    const shearDatasets = this.createShearDatasets(productsData, positionToData);
+    const tensionDatasets = this.createTensionDatasets(
+      productsData,
+      positionToData,
+    );
+    const shearDatasets = this.createShearDatasets(
+      productsData,
+      positionToData,
+    );
 
     // Render tension chart
-    this.renderChart("tensionChart", tensionDatasets, xLabels, groupLabelPlugin,
-      groups, "Tension Strength (lbs)", "hef (in.)");
+    this.renderChart(
+      "tensionChart",
+      tensionDatasets,
+      xLabels,
+      groupLabelPlugin,
+      groups,
+      "Tension Strength (lbs)",
+      "hef (in.)",
+    );
 
     // Render shear chart
-    this.renderChart("shearChart", shearDatasets, xLabels, groupLabelPlugin,
-      groups, "Shear Strength (lbs)", "hef (in.)");
+    this.renderChart(
+      "shearChart",
+      shearDatasets,
+      xLabels,
+      groupLabelPlugin,
+      groups,
+      "Shear Strength (lbs)",
+      "hef (in.)",
+    );
   }
 
   /**
@@ -227,26 +262,28 @@ class CompareView {
       return parseFloat(s) || 0;
     };
 
-    // Collect unique diameters
-    const uniqueDiameters = new Set();
+    // Collect unique anchor sizes
+    const uniqueSizes = new Set();
     productsData.forEach((product) => {
-      product.diameters?.forEach((d) => {
-        const size = d["Anchor Size"]?.value;
-        if (size) uniqueDiameters.add(size);
+      (product.anchorSizes || []).forEach((a) => {
+        const anchorSize = a["Anchor Size"] || a.anchorSize || a || {};
+        const size = anchorSize.value;
+        if (size) uniqueSizes.add(size);
       });
     });
 
-    const allDiameters = Array.from(uniqueDiameters).sort(
-      (a, b) => parseSize(a) - parseSize(b)
+    const allSizes = Array.from(uniqueSizes).sort(
+      (a, b) => parseSize(a) - parseSize(b),
     );
 
     // Build data structure
     const dataBySizeThenHef = new Map();
     productsData.forEach((product) => {
-      product.diameters?.forEach((d) => {
-        const size = d["Anchor Size"]?.value;
+      (product.anchorSizes || []).forEach((a) => {
+        const anchorSize = a["Anchor Size"] || a.anchorSize || a || {};
+        const size = anchorSize.value;
         if (!size) return;
-        const hefs = d["Anchor Size"]?.["Effective Embedment Depth (hef)"] || [];
+        const hefs = anchorSize["Effective Embedment Depth (hef)"] || [];
         hefs.forEach((h) => {
           if (!dataBySizeThenHef.has(size))
             dataBySizeThenHef.set(size, new Map());
@@ -265,12 +302,12 @@ class CompareView {
     let currentPos = 0;
     const groupSpacing = 3;
 
-    allDiameters.forEach((diameter) => {
-      if (!dataBySizeThenHef.has(diameter)) return;
+    allSizes.forEach((size) => {
+      if (!dataBySizeThenHef.has(size)) return;
 
-      const hefMap = dataBySizeThenHef.get(diameter);
+      const hefMap = dataBySizeThenHef.get(size);
       const hefs = Array.from(hefMap.keys()).sort(
-        (a, b) => parseFloat(a) - parseFloat(b)
+        (a, b) => parseFloat(a) - parseFloat(b),
       );
       if (hefs.length === 0) return;
 
@@ -279,12 +316,12 @@ class CompareView {
       hefs.forEach((hef) => {
         xPositions.push(currentPos);
         xLabels.push(String(hef));
-        positionToData.push({ size: diameter, hef });
+        positionToData.push({ size, hef });
         currentPos++;
       });
 
       const groupEnd = currentPos - 1;
-      groups.push({ size: diameter, startIndex: groupStart, endIndex: groupEnd });
+      groups.push({ size, startIndex: groupStart, endIndex: groupEnd });
 
       currentPos += groupSpacing;
     });
@@ -298,9 +335,10 @@ class CompareView {
   createTensionDatasets(productsData, positionToData) {
     return productsData.map((product, idx) => {
       const map = new Map();
-      product.diameters?.forEach((d) => {
-        const size = d["Anchor Size"]?.value;
-        const hefs = d["Anchor Size"]?.["Effective Embedment Depth (hef)"] || [];
+      (product.anchorSizes || []).forEach((a) => {
+        const anchorSize = a["Anchor Size"] || a.anchorSize || a || {};
+        const size = anchorSize.value;
+        const hefs = anchorSize["Effective Embedment Depth (hef)"] || [];
         hefs.forEach((h) => {
           map.set(`${size}-${h.value}`, this.model.getPhi(h, "φNsa"));
         });
@@ -328,9 +366,10 @@ class CompareView {
   createShearDatasets(productsData, positionToData) {
     return productsData.map((product, idx) => {
       const map = new Map();
-      product.diameters?.forEach((d) => {
-        const size = d["Anchor Size"]?.value;
-        const hefs = d["Anchor Size"]?.["Effective Embedment Depth (hef)"] || [];
+      (product.anchorSizes || []).forEach((a) => {
+        const anchorSize = a["Anchor Size"] || a.anchorSize || a || {};
+        const size = anchorSize.value;
+        const hefs = anchorSize["Effective Embedment Depth (hef)"] || [];
         hefs.forEach((h) => {
           map.set(`${size}-${h.value}`, this.model.getPhi(h, "φVsa"));
         });
@@ -361,7 +400,7 @@ class CompareView {
       afterDraw: (chart) => {
         const { ctx, chartArea, scales, options } = chart;
         const xScale = scales.x;
-        const pluginOpts = (options?.plugins?.groupLabels) || {};
+        const pluginOpts = options?.plugins?.groupLabels || {};
         const localGroups = pluginOpts.groups || groups || [];
         const localXLabels = pluginOpts.xLabels || xLabels || [];
 

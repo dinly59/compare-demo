@@ -1,37 +1,36 @@
 /**
- * Product - Represents a complete product with diameters
+ * Product - Represents a complete product with anchor sizes
  */
 class Product {
   constructor(data = {}) {
     this.name = data.name || null;
     this.company = data.company || null;
-    this.diameters = [];
+    this.anchorSizes = [];
 
-    // Parse diameters
-    const diameterArray = data.diameters || [];
-    this.diameters = diameterArray.map((d) => new Diameter(d));
+    const anchorSizeArray = data.anchorSizes || [];
+    this.anchorSizes = anchorSizeArray.map((a) => new AnchorSize(a));
   }
 
   /**
    * Get all anchor sizes
    */
   getAnchorSizes() {
-    return this.diameters.map((d) => d.anchorSize.value);
+    return this.anchorSizes.map((a) => a.value);
   }
 
   /**
-   * Get diameter by anchor size value
+  * Get anchor size by value
    */
-  getDiameterByAnchorSize(sizeValue) {
-    return this.diameters.find((d) => d.anchorSize.value === sizeValue);
+  getAnchorSizeByValue(sizeValue) {
+    return this.anchorSizes.find((a) => a.value === sizeValue);
   }
 
   /**
    * Get total number of specifications
    */
   getTotalSpecCount() {
-    return this.diameters.reduce(
-      (sum, d) => sum + d.anchorSize.effectiveEmbedmentDepths.length,
+    return this.anchorSizes.reduce(
+      (sum, a) => sum + a.effectiveEmbedmentDepths.length,
       0,
     );
   }

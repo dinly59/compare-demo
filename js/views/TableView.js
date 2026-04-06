@@ -150,7 +150,7 @@ class TableView {
       pagedColumns.forEach((col) => {
         const td = document.createElement("td");
         // Use plain text for data-label (remove HTML tags)
-        const plainLabel = metric.label.replace(/<[^>]*>/g, '');
+        const plainLabel = metric.label.replace(/<[^>]*>/g, "");
         td.setAttribute("data-label", plainLabel);
         td.textContent = col.values[metric.key] || "-";
         row.appendChild(td);
@@ -179,11 +179,18 @@ class TableView {
     const company = data.company || "Unknown";
     const product = data.name || "Unknown";
 
-    (data.diameters || []).forEach((d) => {
-      const a = d["Anchor Size"] || d.anchorSize || {};
-      const anchorSize = a.value || a["value"] || a.anchorSize || "n/a";
-      const drillBit = a["Drill Bit Diameter"] || a.drill || "-";
-      const hefs = a["Effective Embedment Depth (hef)"] || [];
+    const anchorSizes = data.anchorSizes || [];
+
+    anchorSizes.forEach((a) => {
+      const anchorSizeData = a["Anchor Size"] || a.anchorSize || a || {};
+      const anchorSize =
+        anchorSizeData.value ||
+        anchorSizeData["value"] ||
+        anchorSizeData.anchorSize ||
+        "n/a";
+      const drillBit =
+        anchorSizeData["Drill Bit Diameter"] || anchorSizeData.drill || "-";
+      const hefs = anchorSizeData["Effective Embedment Depth (hef)"] || [];
 
       hefs.forEach((h) => {
         // Extract all values for this combination
@@ -307,11 +314,11 @@ class TableView {
    */
   groupByField(columns, fieldName) {
     if (!columns || columns.length === 0) return [];
-    
+
     const groups = [];
     let currentValue = columns[0][fieldName];
     let count = 1;
-    
+
     for (let i = 1; i < columns.length; i++) {
       if (columns[i][fieldName] === currentValue) {
         count++;
@@ -321,10 +328,10 @@ class TableView {
         count = 1;
       }
     }
-    
+
     // Push the last group
     groups.push({ value: currentValue, count: count });
-    
+
     return groups;
   }
 
