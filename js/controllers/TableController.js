@@ -27,16 +27,24 @@ class TableController {
    */
   bindEvents() {
     // Product selection
-    this.productSelect?.addEventListener("change", () => this.handleProductChange());
+    this.productSelect?.addEventListener("change", () =>
+      this.handleProductChange(),
+    );
 
     // Filter input
-    this.filterInput?.addEventListener("input", () => this.handleFilterChange());
+    this.filterInput?.addEventListener("input", () =>
+      this.handleFilterChange(),
+    );
 
     // Clear filter button
-    this.clearFilterBtn?.addEventListener("click", () => this.handleClearFilter());
+    this.clearFilterBtn?.addEventListener("click", () =>
+      this.handleClearFilter(),
+    );
 
     // Compact mode toggle
-    this.compactToggle?.addEventListener("change", (e) => this.handleCompactToggle(e));
+    this.compactToggle?.addEventListener("change", (e) =>
+      this.handleCompactToggle(e),
+    );
 
     // Connect view event handlers
     this.view.onSort = (columnIndex) => this.handleSort(columnIndex);
@@ -58,7 +66,8 @@ class TableController {
   populateProductSelect(products) {
     if (!this.productSelect) return;
 
-    this.productSelect.innerHTML = '<option value="">Select a product...</option>';
+    this.productSelect.innerHTML =
+      '<option value="">Select a product...</option>';
     products.forEach((p) => {
       const opt = document.createElement("option");
       opt.value = p;
@@ -91,6 +100,7 @@ class TableController {
       this.currentProduct = filename;
       this.view.resetPage();
       this.renderTable(data);
+      console.log(filename, data);
     } catch (e) {
       this.view.showError(e.message);
     }

@@ -165,14 +165,14 @@ class CompareView {
     // Tension chart
     const tensionChartDiv = this.createChartContainer(
       "tensionChart",
-      "Tension Steel Strength (fNsa) by Anchor Size",
+      "Tension Steel Strength (φN<sub>sa</sub>) by Anchor Size",
     );
     chartsGrid.appendChild(tensionChartDiv);
 
     // Shear chart
     const shearChartDiv = this.createChartContainer(
       "shearChart",
-      "Shear Steel Strength (fVsa) by Anchor Size",
+      "Shear Steel Strength (φV<sub>sa</sub>) by Anchor Size",
     );
     chartsGrid.appendChild(shearChartDiv);
 
@@ -194,7 +194,7 @@ class CompareView {
 
     const titleEl = document.createElement("h3");
     titleEl.className = "text-lg font-semibold text-slate-700 mb-3 text-center";
-    titleEl.textContent = title;
+    titleEl.innerHTML = title;
     div.appendChild(titleEl);
 
     const canvas = document.createElement("canvas");
