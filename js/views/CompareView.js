@@ -40,15 +40,29 @@ class CompareView {
   /**
    * Render comparison view
    */
-  render(productsData) {
+  /**
+   * Render comparison view
+   * @param {Array} productsData
+   * @param {string} concreteState
+   * @param {Object} chartData - { tension: {datasets, xLabels, groups}, shear: {datasets, xLabels, groups} }
+   */
+  render(productsData, concreteState, chartData) {
     this.container.innerHTML = "";
 
-    // Overview section
-    this.renderOverview(productsData);
+    // Optionally show the selected concrete state
+    if (concreteState) {
+      const stateBanner = document.createElement("div");
+      stateBanner.className = "mb-4 px-4 py-2 rounded bg-blue-50 text-blue-800 font-semibold inline-block";
+      stateBanner.textContent = `Concrete State: ${concreteState.charAt(0).toUpperCase() + concreteState.slice(1)}`;
+      this.container.appendChild(stateBanner);
+    }
 
-    // Charts section (if 2 products)
-    if (productsData.length === 2) {
-      this.renderChartsSection(productsData);
+    // Overview section
+    this.renderOverview(productsData, concreteState);
+
+    // Charts section (if chartData provided)
+    if (chartData && chartData.tension && chartData.shear) {
+      this.renderChartsSection(chartData);
     }
   }
 
@@ -149,7 +163,10 @@ class CompareView {
   /**
    * Render charts section
    */
-  renderChartsSection(productsData) {
+  /**
+   * Render charts section using precomputed chartData
+   */
+  renderChartsSection(chartData) {
     const chartsSection = document.createElement("div");
     chartsSection.className =
       "bg-white rounded-xl shadow-md border border-slate-200 p-6";
@@ -181,7 +198,7 @@ class CompareView {
 
     // Render charts after DOM update
     setTimeout(() => {
-      this.renderCharts(productsData);
+      this.renderCharts(chartData);
     }, 100);
   }
 
@@ -209,41 +226,32 @@ class CompareView {
   /**
    * Render comparison charts
    */
-  renderCharts(productsData) {
-    const { xPositions, xLabels, groups, positionToData } =
-      this.prepareChartData(productsData);
-
-    // Create plugin for group labels
-    const groupLabelPlugin = this.createGroupLabelPlugin(groups, xLabels);
-
-    // Prepare datasets
-    const tensionDatasets = this.createTensionDatasets(
-      productsData,
-      positionToData,
-    );
-    const shearDatasets = this.createShearDatasets(
-      productsData,
-      positionToData,
-    );
-
-    // Render tension chart
+  /**
+   * Render charts using precomputed chartData
+   */
+  renderCharts(chartData) {
+    // Tension chart
+    const tension = chartData.tension;
+    const tensionPlugin = this.createGroupLabelPlugin(tension.groups, tension.xLabels);
     this.renderChart(
       "tensionChart",
-      tensionDatasets,
-      xLabels,
-      groupLabelPlugin,
-      groups,
+      tension.datasets,
+      tension.xLabels,
+      tensionPlugin,
+      tension.groups,
       "Tension Strength (lbs)",
       "hef (in.)",
     );
 
-    // Render shear chart
+    // Shear chart
+    const shear = chartData.shear;
+    const shearPlugin = this.createGroupLabelPlugin(shear.groups, shear.xLabels);
     this.renderChart(
       "shearChart",
-      shearDatasets,
-      xLabels,
-      groupLabelPlugin,
-      groups,
+      shear.datasets,
+      shear.xLabels,
+      shearPlugin,
+      shear.groups,
       "Shear Strength (lbs)",
       "hef (in.)",
     );
