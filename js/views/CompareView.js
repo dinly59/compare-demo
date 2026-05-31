@@ -40,15 +40,30 @@ class CompareView {
   /**
    * Render comparison view
    */
-  render(productsData) {
+  /**
+   * Render comparison view
+   * @param {Array} productsData
+   * @param {string} concreteState
+   * @param {Object} chartData - { tension: {datasets, xLabels, groups}, shear: {datasets, xLabels, groups} }
+   */
+  render(productsData, concreteState, chartData) {
     this.container.innerHTML = "";
 
-    // Overview section
-    this.renderOverview(productsData);
+    // Optionally show the selected concrete state
+    if (concreteState) {
+      const stateBanner = document.createElement("div");
+      stateBanner.className =
+        "mb-4 px-4 py-2 rounded bg-blue-50 text-blue-800 font-semibold inline-block";
+      stateBanner.textContent = `Concrete State: ${concreteState.charAt(0).toUpperCase() + concreteState.slice(1)}`;
+      this.container.appendChild(stateBanner);
+    }
 
-    // Charts section (if 2 products)
-    if (productsData.length === 2) {
-      this.renderChartsSection(productsData);
+    // Overview section
+    this.renderOverview(productsData, concreteState);
+
+    // Charts section (if chartData provided)
+    if (chartData && chartData.tension && chartData.shear) {
+      this.renderChartsSection(chartData);
     }
   }
 
@@ -149,7 +164,10 @@ class CompareView {
   /**
    * Render charts section
    */
-  renderChartsSection(productsData) {
+  /**
+   * Render charts section using precomputed chartData
+   */
+  renderChartsSection(chartData) {
     const chartsSection = document.createElement("div");
     chartsSection.className =
       "bg-white rounded-xl shadow-md border border-slate-200 p-6";
@@ -165,14 +183,14 @@ class CompareView {
     // Tension chart
     const tensionChartDiv = this.createChartContainer(
       "tensionChart",
-      "Tension Steel Strength (φN<sub>sa</sub>) by Anchor Size",
+      "Tension Strength",
     );
     chartsGrid.appendChild(tensionChartDiv);
 
     // Shear chart
     const shearChartDiv = this.createChartContainer(
       "shearChart",
-      "Shear Steel Strength (φV<sub>sa</sub>) by Anchor Size",
+      "Shear Strength",
     );
     chartsGrid.appendChild(shearChartDiv);
 
@@ -181,7 +199,7 @@ class CompareView {
 
     // Render charts after DOM update
     setTimeout(() => {
-      this.renderCharts(productsData);
+      this.renderCharts(chartData);
     }, 100);
   }
 
@@ -197,317 +215,125 @@ class CompareView {
     titleEl.innerHTML = title;
     div.appendChild(titleEl);
 
-    const canvas = document.createElement("canvas");
-    canvas.id = id;
-    canvas.style.width = "100%";
-    canvas.style.height = "380px";
-    div.appendChild(canvas);
+    const chartDiv = document.createElement("div");
+    chartDiv.id = id;
+    chartDiv.style.height = "420px";
+    div.appendChild(chartDiv);
 
     return div;
   }
 
   /**
-   * Render comparison charts
+   * Render charts using precomputed chartData (Highcharts grouped categories)
    */
-  renderCharts(productsData) {
-    const { xPositions, xLabels, groups, positionToData } =
-      this.prepareChartData(productsData);
-
-    // Create plugin for group labels
-    const groupLabelPlugin = this.createGroupLabelPlugin(groups, xLabels);
-
-    // Prepare datasets
-    const tensionDatasets = this.createTensionDatasets(
-      productsData,
-      positionToData,
-    );
-    const shearDatasets = this.createShearDatasets(
-      productsData,
-      positionToData,
-    );
-
-    // Render tension chart
-    this.renderChart(
+  renderCharts(chartData) {
+    this.renderHighchart(
       "tensionChart",
-      tensionDatasets,
-      xLabels,
-      groupLabelPlugin,
-      groups,
+      chartData.tension.flatCategories,
+      chartData.tension.groups,
+      chartData.tension.series,
       "Tension Strength (lbs)",
-      "hef (in.)",
     );
-
-    // Render shear chart
-    this.renderChart(
+    this.renderHighchart(
       "shearChart",
-      shearDatasets,
-      xLabels,
-      groupLabelPlugin,
-      groups,
+      chartData.shear.flatCategories,
+      chartData.shear.groups,
+      chartData.shear.series,
       "Shear Strength (lbs)",
-      "hef (in.)",
     );
   }
 
   /**
-   * Prepare chart data structure
+   * Render a Highcharts column chart with uniform hef spacing.
+   * All hef values are flat x-positions (equal width) so spacing is
+   * identical across the whole chart. Diameter groups are shown via
+   * alternating plotBands and dashed plotLines between them.
    */
-  prepareChartData(productsData) {
-    const parseSize = (s) => {
-      if (!s) return 0;
-      if (s.includes("/")) {
-        const [num, den] = s.replace('"', "").split("/");
-        return parseFloat(num) / parseFloat(den);
-      }
-      return parseFloat(s) || 0;
-    };
+  renderHighchart(containerId, flatCategories, groups, series, yTitle) {
+    const el = document.getElementById(containerId);
+    if (!el || !window.Highcharts) return;
 
-    // Collect unique anchor sizes
-    const uniqueSizes = new Set();
-    productsData.forEach((product) => {
-      (product.anchorSizes || []).forEach((a) => {
-        const anchorSize = a["Anchor Size"] || a.anchorSize || a || {};
-        const size = anchorSize.value;
-        if (size) uniqueSizes.add(size);
-      });
-    });
-
-    const allSizes = Array.from(uniqueSizes).sort(
-      (a, b) => parseSize(a) - parseSize(b),
-    );
-
-    // Build data structure
-    const dataBySizeThenHef = new Map();
-    productsData.forEach((product) => {
-      (product.anchorSizes || []).forEach((a) => {
-        const anchorSize = a["Anchor Size"] || a.anchorSize || a || {};
-        const size = anchorSize.value;
-        if (!size) return;
-        const hefs = anchorSize["Effective Embedment Depth (hef)"] || [];
-        hefs.forEach((h) => {
-          if (!dataBySizeThenHef.has(size))
-            dataBySizeThenHef.set(size, new Map());
-          const hefMap = dataBySizeThenHef.get(size);
-          if (!hefMap.has(h.value)) hefMap.set(h.value, []);
-          hefMap.get(h.value).push({ product, h });
-        });
-      });
-    });
-
-    // Build x positions
-    const xPositions = [];
-    const xLabels = [];
-    const groups = [];
-    const positionToData = [];
-    let currentPos = 0;
-    const groupSpacing = 3;
-
-    allSizes.forEach((size) => {
-      if (!dataBySizeThenHef.has(size)) return;
-
-      const hefMap = dataBySizeThenHef.get(size);
-      const hefs = Array.from(hefMap.keys()).sort(
-        (a, b) => parseFloat(a) - parseFloat(b),
-      );
-      if (hefs.length === 0) return;
-
-      const groupStart = currentPos;
-
-      hefs.forEach((hef) => {
-        xPositions.push(currentPos);
-        xLabels.push(String(hef));
-        positionToData.push({ size, hef });
-        currentPos++;
-      });
-
-      const groupEnd = currentPos - 1;
-      groups.push({ size, startIndex: groupStart, endIndex: groupEnd });
-
-      currentPos += groupSpacing;
-    });
-
-    return { xPositions, xLabels, groups, positionToData };
-  }
-
-  /**
-   * Create tension datasets
-   */
-  createTensionDatasets(productsData, positionToData) {
-    return productsData.map((product, idx) => {
-      const map = new Map();
-      (product.anchorSizes || []).forEach((a) => {
-        const anchorSize = a["Anchor Size"] || a.anchorSize || a || {};
-        const size = anchorSize.value;
-        const hefs = anchorSize["Effective Embedment Depth (hef)"] || [];
-        hefs.forEach((h) => {
-          map.set(`${size}-${h.value}`, this.model.getPhi(h, "φNsa"));
-        });
-      });
-
-      const data = positionToData.map((item) => {
-        if (!item) return null;
-        const key = `${item.size}-${item.hef}`;
-        return map.has(key) ? map.get(key) : null;
-      });
-
-      return {
-        label: product.name || `Product ${idx + 1}`,
-        data: data,
-        borderColor: this.colors[idx % this.colors.length],
-        backgroundColor: this.colors[idx % this.colors.length],
-        borderWidth: 2,
-      };
-    });
-  }
-
-  /**
-   * Create shear datasets
-   */
-  createShearDatasets(productsData, positionToData) {
-    return productsData.map((product, idx) => {
-      const map = new Map();
-      (product.anchorSizes || []).forEach((a) => {
-        const anchorSize = a["Anchor Size"] || a.anchorSize || a || {};
-        const size = anchorSize.value;
-        const hefs = anchorSize["Effective Embedment Depth (hef)"] || [];
-        hefs.forEach((h) => {
-          map.set(`${size}-${h.value}`, this.model.getPhi(h, "φVsa"));
-        });
-      });
-
-      const data = positionToData.map((item) => {
-        if (!item) return null;
-        const key = `${item.size}-${item.hef}`;
-        return map.has(key) ? map.get(key) : null;
-      });
-
-      return {
-        label: product.name || `Product ${idx + 1}`,
-        data: data,
-        borderColor: this.colors[idx % this.colors.length],
-        backgroundColor: this.colors[idx % this.colors.length],
-        borderWidth: 2,
-      };
-    });
-  }
-
-  /**
-   * Create group label plugin for Chart.js
-   */
-  createGroupLabelPlugin(groups, xLabels) {
-    return {
-      id: "groupLabels",
-      afterDraw: (chart) => {
-        const { ctx, chartArea, scales, options } = chart;
-        const xScale = scales.x;
-        const pluginOpts = options?.plugins?.groupLabels || {};
-        const localGroups = pluginOpts.groups || groups || [];
-        const localXLabels = pluginOpts.xLabels || xLabels || [];
-
-        if (!localGroups.length) return;
-
-        ctx.save();
-        ctx.fillStyle = "#0f172a";
-        ctx.strokeStyle = "#0f172a";
-        ctx.lineWidth = 1;
-        ctx.font = "bold 14px sans-serif";
-        ctx.textAlign = "center";
-
-        localGroups.forEach((g) => {
-          if (g.startIndex == null || g.endIndex == null) return;
-          const startPixel = xScale.getPixelForValue(g.startIndex);
-          const endPixel = xScale.getPixelForValue(g.endIndex);
-          if (!isFinite(startPixel) || !isFinite(endPixel)) return;
-
-          const center = (startPixel + endPixel) / 2;
-          const bracketY = chartArea.bottom + 8;
-          const bracketHeight = 6;
-          const labelY = chartArea.bottom + 28;
-
-          ctx.beginPath();
-          ctx.moveTo(startPixel, bracketY);
-          ctx.lineTo(startPixel, bracketY + bracketHeight);
-          ctx.moveTo(startPixel, bracketY + bracketHeight);
-          ctx.lineTo(endPixel, bracketY + bracketHeight);
-          ctx.moveTo(endPixel, bracketY);
-          ctx.lineTo(endPixel, bracketY + bracketHeight);
-          ctx.stroke();
-          ctx.fillText(`Ø ${g.size}`, center, labelY);
-        });
-
-        ctx.font = "12px sans-serif";
-        ctx.fillStyle = "#0f172a";
-        localXLabels.forEach((lab, i) => {
-          if (lab) {
-            const x = xScale.getPixelForValue(i);
-            if (!isFinite(x)) return;
-            ctx.fillText(lab, x, chartArea.bottom + 2);
-          }
-        });
-        ctx.restore();
+    // Alternating subtle background bands per diameter group
+    const bandColors = ["rgba(59,130,246,0.06)", "rgba(139,92,246,0.06)"];
+    const plotBands = groups.map((g, i) => ({
+      from: g.startIndex - 0.5,
+      to: g.endIndex + 0.5,
+      color: bandColors[i % bandColors.length],
+      label: {
+        text: `Ø ${g.size}`,
+        align: "center",
+        verticalAlign: "bottom",
+        y: 45,
+        style: { fontWeight: "bold", fontSize: "12px", color: "#334155" },
       },
-    };
-  }
+    }));
 
-  /**
-   * Render a chart
-   */
-  renderChart(canvasId, datasets, xLabels, plugin, groups, yTitle, xTitle) {
-    const ctx = document.getElementById(canvasId);
-    if (ctx && window.Chart) {
-      new Chart(ctx, {
-        type: "bar",
-        data: {
-          labels: xLabels,
-          datasets: datasets,
-        },
-        plugins: [plugin],
-        options: {
-          responsive: true,
-          maintainAspectRatio: true,
-          categoryPercentage: 0.95,
-          barPercentage: 0.85,
-          plugins: {
-            legend: {
-              position: "bottom",
-            },
-            groupLabels: { groups, xLabels },
-            tooltip: {
-              callbacks: {
-                label: function (context) {
-                  let label = context.dataset.label || "";
-                  if (label) label += ": ";
-                  if (context.parsed.y !== null) {
-                    label += context.parsed.y.toLocaleString() + " lbs";
-                  }
-                  return label;
-                },
-              },
-            },
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              title: {
-                display: true,
-                text: yTitle,
-              },
-            },
-            x: {
-              type: "category",
-              title: {
-                display: true,
-                text: xTitle,
-              },
-              ticks: {
-                maxRotation: 0,
-                autoSkip: false,
-                display: false,
-              },
-            },
+    // Dashed separator lines between groups
+    const plotLines = groups.slice(0, -1).map((g) => ({
+      value: g.endIndex + 0.5,
+      color: "#94a3b8",
+      width: 1,
+      dashStyle: "Dash",
+      zIndex: 4,
+    }));
+
+    Highcharts.chart(containerId, {
+      chart: {
+        type: "column",
+        animation: false,
+        style: { fontFamily: "inherit" },
+        marginBottom: 100,
+      },
+      title: { text: null },
+      credits: { enabled: false },
+      xAxis: {
+        type: "category",
+        categories: flatCategories,
+        plotBands,
+        plotLines,
+        labels: { style: { fontSize: "11px" } },
+        // tickWidth: 0,
+      },
+      yAxis: {
+        title: { text: yTitle },
+        min: 0,
+        gridLineColor: "#e2e8f0",
+        labels: {
+          formatter: function () {
+            return this.value.toLocaleString();
           },
         },
-      });
-    }
+      },
+      plotOptions: {
+        column: {
+          grouping: false,
+          groupPadding: 0.1,
+          pointPadding: 0.05,
+          maxPointWidth: 40,
+          borderRadius: 3,
+        },
+      },
+      tooltip: {
+        useHTML: true,
+        formatter: function () {
+          const ptIdx = this.point.index;
+          const grp = groups.find(
+            (g) => ptIdx >= g.startIndex && ptIdx <= g.endIndex,
+          );
+          return (
+            `<span style="font-size:11px;font-weight:bold">${this.series.name}</span><br/>` +
+            `Diameter: <b>Ø ${grp ? grp.size : ""}</b> &mdash; ` +
+            `h<sub>ef</sub>: <b>${this.point.category} in.</b><br/>` +
+            `Strength: <b>${(this.y || 0).toLocaleString()} lbs</b>`
+          );
+        },
+      },
+      legend: {
+        enabled: true,
+        align: "center",
+        verticalAlign: "bottom",
+      },
+      series: series,
+    });
   }
 }

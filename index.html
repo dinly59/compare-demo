@@ -1,11 +1,12 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Anchor Product Table Viewer</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+
     <link rel="stylesheet" href="style.css" />
   </head>
   <body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
@@ -439,6 +440,45 @@
                 <option value="">-- Select --</option>
               </select>
             </div>
+            <div
+              class="mb-6 p-4 bg-slate-50 rounded-lg border border-slate-200"
+            >
+              <label class="block text-sm font-semibold text-slate-700 mb-3">
+                Concrete State
+              </label>
+              <div class="flex gap-6">
+                <div class="flex items-center">
+                  <input
+                    type="radio"
+                    id="cracked"
+                    name="concreteState"
+                    value="cracked"
+                    class="w-4 h-4 text-blue-600 border-slate-300 focus:ring-2 focus:ring-blue-500"
+                  />
+                  <label
+                    for="cracked"
+                    class="ml-2 text-sm text-slate-700 cursor-pointer"
+                  >
+                    Cracked
+                  </label>
+                </div>
+                <div class="flex items-center">
+                  <input
+                    type="radio"
+                    id="uncracked"
+                    name="concreteState"
+                    value="uncracked"
+                    class="w-4 h-4 text-blue-600 border-slate-300 focus:ring-2 focus:ring-blue-500"
+                  />
+                  <label
+                    for="uncracked"
+                    class="ml-2 text-sm text-slate-700 cursor-pointer"
+                  >
+                    Uncracked
+                  </label>
+                </div>
+              </div>
+            </div>
           </div>
           <button
             id="compareBtn"
@@ -484,6 +524,9 @@
     </div>
 
     <!-- MVC Architecture: Load in order - Model, Views, Controllers, App -->
+    <script src="js/models/EffectiveEmbedmentDepth.js"></script>
+    <script src="js/models/AnchorSize.js"></script>
+    <script src="js/models/Product.js"></script>
     <script src="js/models/ProductModel.js"></script>
     <script src="js/views/NavigationView.js"></script>
     <script src="js/views/TableView.js"></script>

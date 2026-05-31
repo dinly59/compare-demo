@@ -219,7 +219,12 @@ class ProductModel {
 
     return anchorSizes.reduce((sum, a) => {
       const anchorSize = a["Anchor Size"] || a.anchorSize || a || {};
-      return sum + (anchorSize["Effective Embedment Depth (hef)"]?.length || 0);
+      return (
+        sum +
+        (anchorSize["Effective Embedment Depth (hef)"]?.length ||
+          anchorSize.effectiveEmbedmentDepths?.length ||
+          0)
+      );
     }, 0);
   }
 }
