@@ -26,63 +26,53 @@ class CompareController {
       anchorSize?.effectiveEmbedmentDepths ||
       [];
 
-    // Collect unique anchor sizes
+    // Collect unique anchor sizes across all products
     const uniqueSizes = new Set();
     productsData.forEach((product) => {
       (product.anchorSizes || []).forEach((a) => {
-        const anchorSize = getAnchorSize(a);
-        const size = anchorSize.value;
+        const size = getAnchorSize(a).value;
         if (size) uniqueSizes.add(size);
       });
     });
-
     const allSizes = Array.from(uniqueSizes).sort(
       (a, b) => parseSize(a) - parseSize(b),
     );
 
-    // Build data structure: size -> hef -> [{product, h}]
-    const dataBySizeThenHef = new Map();
+    // For each size collect all hef values from all products
+    const sizeToHefs = new Map();
     productsData.forEach((product) => {
       (product.anchorSizes || []).forEach((a) => {
         const anchorSize = getAnchorSize(a);
         const size = anchorSize.value;
         if (!size) return;
-        const hefs = getEmbedmentDepths(anchorSize);
-        hefs.forEach((h) => {
-          if (!dataBySizeThenHef.has(size))
-            dataBySizeThenHef.set(size, new Map());
-          const hefMap = dataBySizeThenHef.get(size);
-          if (!hefMap.has(h.value)) hefMap.set(h.value, []);
-          hefMap.get(h.value).push({ product, h });
-        });
+        if (!sizeToHefs.has(size)) sizeToHefs.set(size, new Set());
+        getEmbedmentDepths(anchorSize).forEach((h) =>
+          sizeToHefs.get(size).add(h.value),
+        );
       });
     });
 
-    // Build x positions, xLabels, groups, positionToData
-    const xPositions = [];
-    const xLabels = [];
-    const groups = [];
-    const positionToData = [];
-    let currentPos = 0;
-    const groupSpacing = 3;
+    // Build flat x-axis categories + groups metadata for plotBands/plotLines.
+    // One slot per hef; grouping:false lets each series render independently
+    // so every column is centered on its hef label.
+    const flatCategories = []; // flat hef label strings, one per hef
+    const groups = [];         // [{size, startIndex, endIndex}]
+    const leafOrder = [];      // [{size, hef}] in display order
+    let leafIdx = 0;
 
     allSizes.forEach((size) => {
-      if (!dataBySizeThenHef.has(size)) return;
-      const hefMap = dataBySizeThenHef.get(size);
-      const hefs = Array.from(hefMap.keys()).sort(
+      if (!sizeToHefs.has(size)) return;
+      const hefs = Array.from(sizeToHefs.get(size)).sort(
         (a, b) => parseFloat(a) - parseFloat(b),
       );
-      if (hefs.length === 0) return;
-      const groupStart = currentPos;
+      if (!hefs.length) return;
+      const startIndex = leafIdx;
       hefs.forEach((hef) => {
-        xPositions.push(currentPos);
-        xLabels.push(String(hef));
-        positionToData.push({ size, hef });
-        currentPos++;
+        flatCategories.push(String(hef));
+        leafOrder.push({ size, hef });
+        leafIdx++;
       });
-      const groupEnd = currentPos - 1;
-      groups.push({ size, startIndex: groupStart, endIndex: groupEnd });
-      currentPos += groupSpacing;
+      groups.push({ size, startIndex, endIndex: leafIdx - 1 });
     });
 
     // Helper to get the correct phi value based on concrete state
@@ -121,70 +111,46 @@ class CompareController {
       return Math.min(...values);
     }
 
-    // Build tension datasets
-    const tensionDatasets = productsData.map((product, idx) => {
+    // Build tension series
+    const tensionSeries = productsData.map((product, idx) => {
       const map = new Map();
       (product.anchorSizes || []).forEach((a) => {
         const anchorSize = getAnchorSize(a);
         const size = anchorSize.value;
-        const hefs = getEmbedmentDepths(anchorSize);
-        hefs.forEach((h) => {
+        getEmbedmentDepths(anchorSize).forEach((h) => {
           map.set(
             `${size}-${h.value}`,
             getMinimumPhi(h, ["φNsa", "φNcb", "φNp"]),
           );
         });
       });
-      const data = positionToData.map((item) => {
-        if (!item) return null;
-        const key = `${item.size}-${item.hef}`;
-        return map.has(key) ? map.get(key) : null;
-      });
       return {
-        label: product.name || `Product ${idx + 1}`,
-        data: data,
-        borderColor: this.view.colors[idx % this.view.colors.length],
-        backgroundColor: this.view.colors[idx % this.view.colors.length],
-        borderWidth: 2,
+        name: product.name || `Product ${idx + 1}`,
+        data: leafOrder.map(({ size, hef }) => map.get(`${size}-${hef}`) ?? null),
+        color: this.view.colors[idx % this.view.colors.length],
       };
     });
 
-    // Build shear datasets
-    const shearDatasets = productsData.map((product, idx) => {
+    // Build shear series
+    const shearSeries = productsData.map((product, idx) => {
       const map = new Map();
       (product.anchorSizes || []).forEach((a) => {
         const anchorSize = getAnchorSize(a);
         const size = anchorSize.value;
-        const hefs = getEmbedmentDepths(anchorSize);
-        hefs.forEach((h) => {
+        getEmbedmentDepths(anchorSize).forEach((h) => {
           map.set(`${size}-${h.value}`, getMinimumPhi(h, ["φVsa", "φVcp"]));
         });
       });
-      const data = positionToData.map((item) => {
-        if (!item) return null;
-        const key = `${item.size}-${item.hef}`;
-        return map.has(key) ? map.get(key) : null;
-      });
       return {
-        label: product.name || `Product ${idx + 1}`,
-        data: data,
-        borderColor: this.view.colors[idx % this.view.colors.length],
-        backgroundColor: this.view.colors[idx % this.view.colors.length],
-        borderWidth: 2,
+        name: product.name || `Product ${idx + 1}`,
+        data: leafOrder.map(({ size, hef }) => map.get(`${size}-${hef}`) ?? null),
+        color: this.view.colors[idx % this.view.colors.length],
       };
     });
 
     return {
-      tension: {
-        datasets: tensionDatasets,
-        xLabels,
-        groups,
-      },
-      shear: {
-        datasets: shearDatasets,
-        xLabels,
-        groups,
-      },
+      tension: { flatCategories, groups, series: tensionSeries },
+      shear: { flatCategories, groups, series: shearSeries },
     };
   }
 
